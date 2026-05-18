@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  ollama:
+    container_name: codebase-ollama-1
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_storage:/root/.ollama
+
+volumes:
+  ollama_storage:
+    driver: local
