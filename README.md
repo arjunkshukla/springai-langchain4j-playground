@@ -14,7 +14,7 @@ Files
 Validate the Compose (compose.yaml) file
 
 ```powershell
-# Change to the root of this project
+# From root of the project execute the below command to validate the compose.yaml file.
 
 docker compose -f compose.yaml config
 ```
@@ -22,6 +22,7 @@ docker compose -f compose.yaml config
 Start the service in the background
 
 ```powershell
+# From root of the project execute the below command to start the service in the background (detached mode).
 docker compose -f compose.yaml up -d
 ```
 
