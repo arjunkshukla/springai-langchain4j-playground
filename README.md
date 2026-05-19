@@ -14,7 +14,7 @@ Files
 Validate the Compose (compose.yaml) file
 
 ```powershell
-cd C:\Data\Development\AI\POC\springai-langchain4j-playground\codebase
+# Change to the root of this project
 
 docker compose -f compose.yaml config
 ```
