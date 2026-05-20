@@ -1,0 +1,101 @@
+{
+  "info": {
+    "_postman_id": "f6058171-80a2-45c2-bcef-491fe7d3a42e",
+    "name": "springai-langchian4j",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26580886"
+  },
+  "item": [
+    {
+      "name": "Basics",
+      "item": [
+        {
+          "name": "Ask AI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/ask?question=about your self&model=ollama",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "ask"
+              ],
+              "query": [
+                {
+                  "key": "question",
+                  "value": "about your self"
+                },
+                {
+                  "key": "model",
+                  "value": "ollama",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Tell a Joke",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/joke?topic=Donald Trump&model=openai",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "joke"
+              ],
+              "query": [
+                {
+                  "key": "topic",
+                  "value": "Donald Trump"
+                },
+                {
+                  "key": "model",
+                  "value": "openai",
+                  "type": "text"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "host",
+      "value": ""
+    }
+  ]
+}
