@@ -23,6 +23,9 @@ public class PromptController {
 	
 	@Value("classpath:/prompt/prompt_template.st")
 	private Resource templateResource;
+	
+	@Value("classpath:/prompt/user-analysis.st")
+	private Resource userAnalysisTemplateResource;
 
 	public PromptController(ChatClient chatClient, SpelPromptTemplateRenderer templateRenderer) {
 		this.chatClient = chatClient;
@@ -31,7 +34,7 @@ public class PromptController {
 	
 	@GetMapping("/inline")
 	public String inlineString(@RequestParam String topic) {
-		PromptTemplate template = new PromptTemplate("Tell me a joke about {topic}");
+		PromptTemplate template = PromptTemplate.builder().template("Tell me a joke about {topic}").build();
 		Prompt prompt = template.create(Map.of("topic", topic));
 		
 		return chatClient.prompt(prompt)// Initiates the prompt-building process for a chat interaction with the AI.
@@ -44,7 +47,7 @@ public class PromptController {
 	
 	@GetMapping("/read-from-template-file")
 	public String readFromFile(@RequestParam String topic, @RequestParam(defaultValue = "50") Integer length) {
-		PromptTemplate template = new PromptTemplate(templateResource);
+		PromptTemplate template = PromptTemplate.builder().resource(templateResource).build();
 		Prompt prompt = template.create(Map.of("topic", topic,"length", length));
 		
 		return chatClient.prompt(prompt)// Initiates the prompt-building process for a chat interaction with the AI.
@@ -58,13 +61,7 @@ public class PromptController {
 	@GetMapping("/using-spel")
 	public String usingSpelRenderer(@RequestParam String name, @RequestParam(defaultValue = "true") Boolean isPremium, @RequestParam(defaultValue = "50") Integer loginCount) {
 		PromptTemplate template = PromptTemplate.builder()
-				.template("""
-						Analyze the following user profile:
-						Name: #{#name}
-						Status: #{#isPremium ? 'VIP Member' : 'Standard User'}
-						Activity Level: #{#loginCount > 50 ? 'High' : 'Low'}
-						Based on this, suggest 3 engagement strategies.
-						""")
+				.resource(userAnalysisTemplateResource)
 				.renderer(templateRenderer)
 				.build();
 
