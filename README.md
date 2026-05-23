@@ -1,66 +1,52 @@
 # springai-langchain4j-playground
 
-This project demonstrates using Spring + LangChain-style integrations. The section below explains how to run the Ollama service locally using Docker Compose.
+This repository is organized as a set of small branch-based demos.
 
-## Run Ollama locally (Docker)
+The `main` branch is the index. It tells you which branch contains which experiment, so you can switch to the right branch before running or reading the code.
 
-Prerequisites
-- Docker (Desktop/daemon) installed and running on your machine.
-- Port 11434 must be available on the host.
+## How to use this repo
 
-Files
-- compose.yaml — Docker Compose file for the ollama service. This repository sets a fixed container name so you can address it directly.
+1. Read the branch summaries below.
+2. Switch to the branch that matches the demo you want to inspect.
+3. Open that branch’s `README.md` for the branch-specific setup and endpoint guide.
 
-Validate the Compose (compose.yaml) file
-
-```powershell
-# From root of the project execute the below command to validate the compose.yaml file.
-
-docker compose -f compose.yaml config
-```
-
-Start the service in the background
+Example:
 
 ```powershell
-# From root of the project execute the below command to start the service in the background (detached mode).
-docker compose -f compose.yaml up -d
+git switch base-example-with-local-llama
 ```
 
-Check running containers
+## Branch guide
 
-```powershell
-# show Compose/ Docker ps output
-docker compose -f compose.yaml ps
-# or
-docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
-```
+| Branch | What it demonstrates |
+| --- | --- |
+| `base-example-with-local-llama` | A simple Spring AI playground backed by local Ollama and a single `GenerativeController` with `/ask` and `/joke`. |
+| `base-example-with-openai-sdk` | Side-by-side Spring AI and LangChain4j examples using the OpenAI SDK, including LangChain4j direct model calls and AI services. |
+| `multi-provider-strategy` | Provider routing at request time, letting the same endpoints choose between OpenAI and local Ollama. |
+| `managinig-io-prompttemplate-converters` | Prompt templates, SpEL rendering, structured output, list/map extraction, streaming, and browser streaming demos. |
 
-Run the ollama command inside the container
+## Where to start
 
-This repository's compose.yaml sets a fixed container name `codebase-ollama-1`. Use that name when running commands inside the container:
+If you want:
 
-```bash
-# pull (if needed) and run the Llama 3 model inside the container
-docker exec -it codebase-ollama-1 ollama run llama3
-```
+- the simplest local model demo, switch to `base-example-with-local-llama`
+- a Spring AI vs LangChain4j comparison on OpenAI, switch to `base-example-with-openai-sdk`
+- runtime provider switching between OpenAI and Ollama, switch to `multi-provider-strategy`
+- prompt templating, structured output, and streaming experiments, switch to `managinig-io-prompttemplate-converters`
 
-Running docker exec -it codebase-ollama-1 ollama run llama3 will pull (if not already present) and run the Llama 3 model inside that container — Llama 3 provides a strong balance of speed and intelligence. Ensure the container is running before executing the command.
+## Why the branches are split this way
 
-Model note
-- Llama 3 is a good default for development and evaluation due to its balance of speed and intelligence.
+Each branch keeps one idea small and readable.
 
-Follow logs
+That makes it easier to:
 
-```powershell
-docker compose -f compose.yaml logs -f ollama
-```
+- inspect one experiment at a time
+- compare approaches without unrelated code in the way
+- keep the README aligned with the code in that branch
+- add new demos later by creating a branch and updating this index
 
-Stop and remove containers
+## Current branch
 
-```powershell
-docker compose -f compose.yaml down
-```
+You are reading `main`, which serves as the branch directory for the rest of the project.
 
-Notes
-- Use `docker compose` (Compose V2) if available; fall back to `docker-compose` if necessary.
-- If you prefer a different fixed container name, edit compose.yaml and set `container_name: <your-name>` under the service.
+For detailed setup, endpoints, and runtime notes, read the `README.md` in the branch you switch to.
