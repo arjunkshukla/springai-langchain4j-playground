@@ -15,7 +15,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{host}}/ask?question=about your self",
+              "raw": "{{host}}/ask?question=about your self&model=ollama",
               "host": [
                 "{{host}}"
               ],
@@ -26,6 +26,11 @@
                 {
                   "key": "question",
                   "value": "about your self"
+                },
+                {
+                  "key": "model",
+                  "value": "ollama",
+                  "type": "text"
                 }
               ]
             }
@@ -43,6 +48,287 @@
                 "{{host}}"
               ],
               "path": [
+                "joke"
+              ],
+              "query": [
+                {
+                  "key": "topic",
+                  "value": "Donald Trump"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Prompt",
+      "item": [
+        {
+          "name": "Inline",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/prompt/inline?topic=Donald Trump",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "prompt",
+                "inline"
+              ],
+              "query": [
+                {
+                  "key": "topic",
+                  "value": "Donald Trump"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reading From Template File",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/prompt/read-from-template-file?topic=Donald Trump",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "prompt",
+                "read-from-template-file"
+              ],
+              "query": [
+                {
+                  "key": "topic",
+                  "value": "Donald Trump"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Using SPEL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/prompt/using-spel?name=Donald Trump&isPremium=false&loginCount=10",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "prompt",
+                "using-spel"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Donald Trump"
+                },
+                {
+                  "key": "isPremium",
+                  "value": "false"
+                },
+                {
+                  "key": "loginCount",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Response Mapping",
+      "item": [
+        {
+          "name": "Bean Output Converter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/response-mapping/bean-output-converter",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "response-mapping",
+                "bean-output-converter"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Bean Output Converter V2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/response-mapping/bean-output-converter-v2",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "response-mapping",
+                "bean-output-converter-v2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Native Structured Output",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/response-mapping/native-structured-output",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "response-mapping",
+                "native-structured-output"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Output Converter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/response-mapping/list-output-converter",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "response-mapping",
+                "list-output-converter"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Output Converter V2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/response-mapping/list-output-converter-v2",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "response-mapping",
+                "list-output-converter-v2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Native Structured Output List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/response-mapping/native-structured-output-list",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "response-mapping",
+                "native-structured-output-list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Map Output Converter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/response-mapping/map-output-converter",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "response-mapping",
+                "map-output-converter"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Map Output Converter V2",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/response-mapping/map-output-converter-v2",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "response-mapping",
+                "map-output-converter-v2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Native Structured Output Map",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/response-mapping/native-structured-output-map",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "response-mapping",
+                "native-structured-output-map"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Stream",
+      "item": [
+        {
+          "name": "Stream",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/stream/joke?topic=Donald Trump",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "stream",
                 "joke"
               ],
               "query": [
