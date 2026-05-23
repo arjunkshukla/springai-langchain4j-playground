@@ -1,0 +1,33 @@
+Meeting Transcript
+
+Riya: Thanks everyone for joining. Today’s discussion is mainly about improving the onboarding experience for new customers before the next quarterly release.
+
+Daniel: Support tickets related to account setup are still higher than expected. Most users are confused during the first 10 minutes after signup.
+
+Meera: I reviewed the analytics yesterday. Roughly 35% of users abandon the process before completing profile verification.
+
+Riya: That aligns with the feedback from sales. We should simplify the verification flow and reduce unnecessary steps.
+
+Daniel: I can work with the support team to identify the three most common pain points. If possible, I’ll prepare a short report by next Wednesday because product decisions are waiting on that data.
+
+Riya: Perfect. That’s pretty important, so let’s treat it as urgent.
+
+Meera: I also think the welcome email sequence needs revision. The current messaging is too technical for first-time users.
+
+Riya: Agreed. Could you draft a simpler version and coordinate with marketing?
+
+Meera: Yes, I’ll share the first draft by the end of next week. I’d classify this as medium priority since it’s helpful but not blocking release work.
+
+Daniel: Another thing — engineering mentioned the dashboard loads slowly for users with large datasets.
+
+Riya: Right, but performance optimization can happen after onboarding improvements. Still worth tracking though.
+
+Karthik: I can investigate the dashboard issue and suggest quick optimizations. I don’t think it’s critical right now, so low priority should be fine. I’ll provide findings before the 18th.
+
+Riya: Sounds good. Anything else before we wrap up?
+
+Meera: Nothing from my side.
+
+Daniel: All set.
+
+Riya: Great. To summarize, the focus remains on improving onboarding completion rates and reducing user confusion during signup. We have a few follow-up tasks assigned, and we’ll review progress in the next sync. Thanks again, everyone!
