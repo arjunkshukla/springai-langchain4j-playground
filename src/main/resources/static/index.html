@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Stream Demo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --line: #d1d5db;
+      --accent: #2563eb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    p {
+      margin: 0 0 16px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    input {
+      flex: 1 1 260px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    button {
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .status {
+      margin: 14px 0 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .output {
+      min-height: 260px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      background: #fcfcfd;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .cursor::after {
+      content: "▍";
+      animation: blink 1s step-end infinite;
+      color: var(--accent);
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>AI Stream Demo</h1>
+      <p>Type a topic, then stream the response from the backend one chunk at a time.</p>
+
+      <div class="row">
+        <input id="topic" type="text" value="Donald Trump" placeholder="Enter a topic" />
+        <button id="send" class="primary">Stream</button>
+        <button id="stop" class="secondary" disabled>Stop</button>
+      </div>
+
+      <div id="status" class="status">Idle</div>
+      <div id="output" class="output"></div>
+    </div>
+  </div>
+
+  <script>
+    const topicEl = document.getElementById("topic");
+    const sendEl = document.getElementById("send");
+    const stopEl = document.getElementById("stop");
+    const statusEl = document.getElementById("status");
+    const outputEl = document.getElementById("output");
+
+    let source = null;
+    let currentText = "";
+
+    function setIdle() {
+      stopEl.disabled = true;
+      sendEl.disabled = false;
+      outputEl.classList.remove("cursor");
+    }
+
+    function startStream() {
+      const topic = topicEl.value.trim();
+      if (!topic) {
+        statusEl.textContent = "Please enter a topic.";
+        return;
+      }
+
+      if (source) {
+        source.close();
+      }
+
+      currentText = "";
+      outputEl.textContent = "";
+      outputEl.classList.add("cursor");
+      statusEl.textContent = "Streaming...";
+      sendEl.disabled = true;
+      stopEl.disabled = false;
+
+      const url = `/stream/joke?topic=${encodeURIComponent(topic)}`;
+      source = new EventSource(url);
+
+      source.onmessage = (event) => {
+        currentText = currentText + " " + event.data;
+        outputEl.textContent = currentText;
+      };
+
+      source.onerror = () => {
+        if (source) {
+          source.close();
+          source = null;
+        }
+        statusEl.textContent = "Stream finished.";
+        setIdle();
+      };
+    }
+
+    function stopStream() {
+      if (source) {
+        source.close();
+        source = null;
+      }
+      statusEl.textContent = "Stopped.";
+      setIdle();
+    }
+
+    sendEl.addEventListener("click", startStream);
+    stopEl.addEventListener("click", stopStream);
+
+    topicEl.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        startStream();
+      }
+    });
+  </script>
+</body>
+</html>
