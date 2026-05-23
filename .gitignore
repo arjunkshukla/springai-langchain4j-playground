@@ -32,3 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 /.tmp
+
+# Ignore extracted source trees or inspection artifacts dropped at the repo root
+/org/
