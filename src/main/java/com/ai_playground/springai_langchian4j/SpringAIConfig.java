@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class AIConfig {
+public class SpringAIConfig {
 
 	// This method defines a Spring Bean for the ChatClient,
 	// which is used to interact with the AI.
