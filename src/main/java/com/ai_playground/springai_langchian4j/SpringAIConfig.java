@@ -1,29 +1,36 @@
 package com.ai_playground.springai_langchian4j;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class SpringAIConfig {
 
-	// This method defines a Spring Bean for the ChatClient,
-	// which is used to interact with the AI.
-	// The ChatClient is configured with a default system prompt that sets the
-	// context for the AI,
-	// instructing it to act as a helpful Java Assistant.
-	// This means that any interactions with the AI will be framed within this
-	// context,
-	// guiding the AI's responses to be relevant to Java programming assistance.
 	@Bean
-	public ChatClient chatClient(ChatClient.Builder builder) {// The ChatClient.Builder is injected into the method,
-																// allowing us to configure the ChatClient before it is
-																// built.
-		return builder.defaultSystem("You are a helpful Java Assistant").build();// The builder is used to set a default
-																					// system prompt for the ChatClient,
-																					// and then the build() method is
-																					// called to create the ChatClient
-																					// instance that will be managed by
-																					// Spring.
+	public ChatMemory chatMemory() {
+		// Use Spring AI's current in-memory chat-memory implementation.
+		// This keeps the in-memory example intact while matching the 1.1.x memory API.
+		return MessageWindowChatMemory.builder()
+				.maxMessages(10)//Configure the Advisor's memory to keep the last 10 messages in context. Adjust as needed for your use case.
+				.build();
 	}
+	
+	@Bean
+	@Primary
+	public ChatClient chatClient(ChatClient.Builder builder) {
+		// Keep the shared ChatClient plain so the non-memory examples keep working.
+		// The memory demo uses a dedicated client bean with MessageChatMemoryAdvisor.
+		return builder.defaultSystem("You are a helpful Java Assistant").build();
+	}
+
+	@Bean("memoryChatClient")
+	public ChatClient memoryChatClient(ChatClient.Builder builder, ChatMemory chatMemory) {
+		return builder.defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build()).build();
+	}
+	
 }
