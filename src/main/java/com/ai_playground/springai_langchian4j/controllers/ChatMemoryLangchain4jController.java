@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ai_playground.springai_langchian4j.lc4j.InMemoryAssistant;
+import com.ai_playground.springai_langchian4j.lc4j.RedisStoreChatAssistantWithSlidingWindowStrategy;
 import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithMessageSummarizationStrategy;
 import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithSlidingWindowStrategy;
 import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithTokenWindowStrategy;
@@ -19,15 +20,18 @@ public class ChatMemoryLangchain4jController {
 	private final SQLPersistedChatAssistantWithSlidingWindowStrategy sqlPersistedChatAssistantWithSlidingWindowStrategy;
 	private final SQLPersistedChatAssistantWithTokenWindowStrategy sqlPersistedChatAssistantWithTokenWindowStrategy;
 	private final SQLPersistedChatAssistantWithMessageSummarizationStrategy sqlPersistedChatAssistantWithMessageSummarizationStrategy;
+	private final RedisStoreChatAssistantWithSlidingWindowStrategy redisStoreChatAssistantWithSlidingWindowStrategy;
 
 	public ChatMemoryLangchain4jController(InMemoryAssistant inMemoryAssistant,
 			SQLPersistedChatAssistantWithSlidingWindowStrategy sqlPersistedChatAssistantWithSlidingWindowStrategy,
 			SQLPersistedChatAssistantWithTokenWindowStrategy sqlPersistedChatAssistantWithTokenWindowStrategy,
-			SQLPersistedChatAssistantWithMessageSummarizationStrategy sqlPersistedChatAssistantWithMessageSummarizationStrategy) {
+			SQLPersistedChatAssistantWithMessageSummarizationStrategy sqlPersistedChatAssistantWithMessageSummarizationStrategy,
+			RedisStoreChatAssistantWithSlidingWindowStrategy redisStoreChatAssistantWithSlidingWindowStrategy) {
 		this.inMemoryAssistant = inMemoryAssistant;
 		this.sqlPersistedChatAssistantWithSlidingWindowStrategy = sqlPersistedChatAssistantWithSlidingWindowStrategy;
 		this.sqlPersistedChatAssistantWithTokenWindowStrategy = sqlPersistedChatAssistantWithTokenWindowStrategy;
 		this.sqlPersistedChatAssistantWithMessageSummarizationStrategy = sqlPersistedChatAssistantWithMessageSummarizationStrategy;
+		this.redisStoreChatAssistantWithSlidingWindowStrategy = redisStoreChatAssistantWithSlidingWindowStrategy;
 	}
 
 	@PostMapping("/in-memory-chat")
@@ -48,5 +52,10 @@ public class ChatMemoryLangchain4jController {
 	@PostMapping("/sql-persisted-memory-chat-with-message-summarization-strategy")
 	public String sqlPersistedMemoryChatWithMessageSummarizationStrategy(@RequestParam String sessionId, @RequestBody String message) {
 		return sqlPersistedChatAssistantWithMessageSummarizationStrategy.chat(sessionId, message);
+	}
+	
+	@PostMapping("/redis-store-chat-with-sliding-window-strategy")
+	public String redisStoreChatWithSlidingWindowStrategy(@RequestParam String sessionId, @RequestBody String message) {
+		return redisStoreChatAssistantWithSlidingWindowStrategy.chat(sessionId, message);
 	}
 }

@@ -1,18 +1,23 @@
 package com.ai_playground.springai_langchian4j;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import com.ai_playground.springai_langchian4j.lc4j.ChatMessageEntityRepository;
-import com.ai_playground.springai_langchian4j.lc4j.LocalTokenCountEstimator;
 import com.ai_playground.springai_langchian4j.lc4j.InMemoryAssistant;
+import com.ai_playground.springai_langchian4j.lc4j.LocalTokenCountEstimator;
 import com.ai_playground.springai_langchian4j.lc4j.MessageSummaryChatMemory;
 import com.ai_playground.springai_langchian4j.lc4j.PersistentChatMemoryStore;
+import com.ai_playground.springai_langchian4j.lc4j.RedisStoreChatAssistantWithSlidingWindowStrategy;
 import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithMessageSummarizationStrategy;
 import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithSlidingWindowStrategy;
 import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithTokenWindowStrategy;
 
+import dev.langchain4j.community.store.memory.chat.redis.RedisChatMemoryStore;
+import dev.langchain4j.community.store.memory.chat.redis.StoreType;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.memory.chat.TokenWindowChatMemory;
@@ -54,6 +59,7 @@ public class LangChain4jConfig {
 	}
 	
 	@Bean
+	@Primary
 	public ChatMemoryStore persistentChatMemoryStore(ChatMessageEntityRepository chatMessageEntityRepository) {
 		return new PersistentChatMemoryStore(chatMessageEntityRepository);
 	}
@@ -77,7 +83,6 @@ public class LangChain4jConfig {
 	@Bean
 	public SQLPersistedChatAssistantWithSlidingWindowStrategy sqlPersistedChatAssistantWithSlidingWindowStrategy(
 			ChatModel langchain4jOllamaChatModel,
-			ChatMemoryStore persistentChatMemoryStore,
 			ChatMemoryProvider persistentMemoryProvider) {
 		
 		return AiServices.builder(SQLPersistedChatAssistantWithSlidingWindowStrategy.class)
@@ -108,7 +113,6 @@ public class LangChain4jConfig {
 	@Bean
 	public SQLPersistedChatAssistantWithTokenWindowStrategy sqlPersistedChatAssistantWithTokenWindowStrategy(
 			ChatModel langchain4jOllamaChatModel,
-			ChatMemoryStore persistentChatMemoryStore,
 			ChatMemoryProvider tokenWindowProvider) {
 		
 		return AiServices.builder(SQLPersistedChatAssistantWithTokenWindowStrategy.class)
@@ -134,12 +138,48 @@ public class LangChain4jConfig {
 	@Bean
 	public SQLPersistedChatAssistantWithMessageSummarizationStrategy sqlPersistedChatAssistantWithMessageSummarizationStrategy(
 			ChatModel langchain4jOllamaChatModel,
-			ChatMemoryStore persistentChatMemoryStore,
 			ChatMemoryProvider tokenSummarizationProvider) {
 		
 		return AiServices.builder(SQLPersistedChatAssistantWithMessageSummarizationStrategy.class)
 				.chatModel(langchain4jOllamaChatModel)
 				.chatMemoryProvider(tokenSummarizationProvider)
+				.build();
+	}
+	
+	@Bean
+	public ChatMemoryStore redisChatMemoryStore(
+			@Value("${langchain4j.redis.chat-memory.host:localhost}") String host,
+			@Value("${langchain4j.redis.chat-memory.port:6379}") int port,
+			@Value("${langchain4j.redis.chat-memory.password:}") String password) {
+		// Redis gives us a lightweight external store for chat memory experiments,
+		// separate from the JPA-backed store that this branch already uses for SQL.
+		var builder = RedisChatMemoryStore.builder()
+				.host(host)
+				.port(port)
+				.storeType(StoreType.STRING);
+		if (password != null && !password.isBlank()) {
+			builder.password(password);
+		}
+		return builder.build();
+	}
+	
+	@Bean
+	public ChatMemoryProvider redisStoreMemoryProvider(@Qualifier("redisChatMemoryStore") ChatMemoryStore redisChatMemoryStore) {
+		return memoryId -> MessageWindowChatMemory.builder()
+				.id(memoryId)
+				.maxMessages(DEFAULT_MAX_MESSAGES)
+				.chatMemoryStore(redisChatMemoryStore)
+				.build();
+	}
+	
+	@Bean
+	public RedisStoreChatAssistantWithSlidingWindowStrategy redisStoreChatAssistantWithSlidingWindowStrategy(
+			ChatModel langchain4jOllamaChatModel,
+			ChatMemoryProvider redisStoreMemoryProvider) {
+		
+		return AiServices.builder(RedisStoreChatAssistantWithSlidingWindowStrategy.class)
+				.chatModel(langchain4jOllamaChatModel)
+				.chatMemoryProvider(redisStoreMemoryProvider)
 				.build();
 	}
 }
