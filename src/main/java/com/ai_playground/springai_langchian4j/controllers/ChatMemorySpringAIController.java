@@ -23,11 +23,15 @@ public class ChatMemorySpringAIController {
 
 	private final ChatClient chatClient;
 	private final ChatClient memoryChatClient;
+	private final ChatClient persistedChatClient;
 	private final List<Message> conversationHistory = new ArrayList<>();
 
-	public ChatMemorySpringAIController(@Qualifier("chatClient") ChatClient chatClient, @Qualifier("memoryChatClient") ChatClient memoryChatClient) {
+	public ChatMemorySpringAIController(@Qualifier("chatClient") ChatClient chatClient, 
+			@Qualifier("memoryChatClient") ChatClient memoryChatClient,
+			@Qualifier("persistedChatClient") ChatClient persistedChatClient) {
 		this.chatClient = chatClient;
 		this.memoryChatClient = memoryChatClient;
+		this.persistedChatClient = persistedChatClient;
 	}
 	
 	@GetMapping("/no-memory-management")
@@ -51,6 +55,17 @@ public class ChatMemorySpringAIController {
 		// Spring AI's MessageChatMemoryAdvisor requires a conversation id per request.
 		// We pass it here so the same session can pick up previous messages from the in-memory ChatMemory.
 		return memoryChatClient.prompt()
+				.user(message)
+				.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
+				.call()
+				.content();
+	}
+	
+	@PostMapping("/persisted-memory-chat")
+	public String persistedMemoryChat(@RequestParam String sessionId, @RequestBody String message) {
+		// Spring AI's MessageChatMemoryAdvisor requires a conversation id per request.
+		// We pass it here so the same session can pick up previous messages from the in-memory ChatMemory.
+		return persistedChatClient.prompt()
 				.user(message)
 				.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
 				.call()
