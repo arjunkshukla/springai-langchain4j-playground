@@ -10,7 +10,6 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,14 +33,14 @@ public class ChatMemorySpringAIController {
 		this.persistedChatClient = persistedChatClient;
 	}
 	
-	@GetMapping("/no-memory-management")
-	public String noMemoryManagement(@RequestParam String input) {
-		return chatClient.prompt().user(input).call().content();
+	@PostMapping("/no-memory-management")
+	public String noMemoryManagement(@RequestBody String message) {
+		return chatClient.prompt().user(message).call().content();
 	}
 	
-	@GetMapping("/manual-memory-management")
-	public String manualMemoryManagement(@RequestParam String input) {
-		conversationHistory.add(new UserMessage(input));
+	@PostMapping("/manual-memory-management")
+	public String manualMemoryManagement(@RequestBody String message) {
+		conversationHistory.add(new UserMessage(message));
 		
 		ChatResponse chatResponse1 = chatClient.prompt().messages(conversationHistory).call().chatResponse();
 		

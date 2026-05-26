@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "f6058171-80a2-45c2-bcef-491fe7d3a42e",
+    "_postman_id": "52b7a596-71af-4cc5-8880-747c3aa31d11",
     "name": "springai-langchian4j",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "26580886"
@@ -49,6 +49,301 @@
                 {
                   "key": "topic",
                   "value": "Donald Trump"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Spring AI Chat Memory",
+      "item": [
+        {
+          "name": "No Memory Management",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "What is my name?",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/chat-memory-springai/no-memory-management",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "chat-memory-springai",
+                "no-memory-management"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Manual Memory Management",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "What is my name?",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/chat-memory-springai/manual-memory-management",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "chat-memory-springai",
+                "manual-memory-management"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "In Memory Chat",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "Who am I?",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/chat-memory-springai/in-memory-chat?sessionId=session2",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "chat-memory-springai",
+                "in-memory-chat"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Persisted Memory Chat",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "Who am I?",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/chat-memory-springai/persisted-memory-chat?sessionId=session2",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "chat-memory-springai",
+                "persisted-memory-chat"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session2"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "LangChain4j Chat Memory",
+      "item": [
+        {
+          "name": "In Memory Chat",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "Who am I?",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/chat-memory-lc4j/in-memory-chat?sessionId=session1",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "chat-memory-lc4j",
+                "in-memory-chat"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SQL Persisted Memory Chat With Sliding Window Strategy",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "what is my name?",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/chat-memory-lc4j/sql-persisted-memory-chat-with-sliding-window-strategy?sessionId=session1",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "chat-memory-lc4j",
+                "sql-persisted-memory-chat-with-sliding-window-strategy"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SQL Persisted Memory Chat With Token Window Strategy",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "what is my name?",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/chat-memory-lc4j/sql-persisted-memory-chat-with-token-window-strategy?sessionId=session1",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "chat-memory-lc4j",
+                "sql-persisted-memory-chat-with-token-window-strategy"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "SQL Persisted Memory Chat With Message Summarization Strategy",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "what is my name?",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/chat-memory-lc4j/sql-persisted-memory-chat-with-message-summarization-strategy?sessionId=session3",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "chat-memory-lc4j",
+                "sql-persisted-memory-chat-with-message-summarization-strategy"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session3"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Redis Store Chat With Sliding Window Strategy",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "who am I?",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/chat-memory-lc4j/redis-store-chat-with-sliding-window-strategy?sessionId=session1",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "chat-memory-lc4j",
+                "redis-store-chat-with-sliding-window-strategy"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session1"
                 }
               ]
             }
