@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.ai_playground.springai_langchian4j.lc4j.ChatMessageEntityRepository;
+import com.ai_playground.springai_langchian4j.lc4j.LocalTokenCountEstimator;
 import com.ai_playground.springai_langchian4j.lc4j.InMemoryAssistant;
 import com.ai_playground.springai_langchian4j.lc4j.MessageSummaryChatMemory;
 import com.ai_playground.springai_langchian4j.lc4j.PersistentChatMemoryStore;
@@ -12,11 +13,6 @@ import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWith
 import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithSlidingWindowStrategy;
 import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithTokenWindowStrategy;
 
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.data.message.ChatMessage;
-import dev.langchain4j.data.message.SystemMessage;
-import dev.langchain4j.data.message.ToolExecutionResultMessage;
-import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.memory.chat.TokenWindowChatMemory;
@@ -34,54 +30,6 @@ public class LangChain4jConfig {
 	@Bean
 	public ChatMemoryProvider memoryProvider() {
 		return memory -> MessageWindowChatMemory.withMaxMessages(DEFAULT_MAX_MESSAGES);
-	}
-
-	@Bean
-	public TokenCountEstimator tokenCountEstimator() {
-		// LangChain4j 1.11 does not ship a generic tokenizer for Ollama here, so we use a
-		// local token estimator that keeps token-window memory functional without adding
-		// another provider-specific dependency.
-		return new TokenCountEstimator() {
-			@Override
-			public int estimateTokenCountInText(String text) {
-				if (text == null || text.isBlank()) {
-					return 0;
-				}
-				return text.trim().split("\\s+|(?=[\\p{Punct}])|(?<=[\\p{Punct}])").length;
-			}
-
-			@Override
-			public int estimateTokenCountInMessage(ChatMessage message) {
-				int tokenCount = 4;
-				if (message instanceof SystemMessage systemMessage) {
-					tokenCount += estimateTokenCountInText(systemMessage.text());
-				} else if (message instanceof UserMessage userMessage) {
-					if (userMessage.hasSingleText()) {
-						tokenCount += estimateTokenCountInText(userMessage.singleText());
-					} else {
-						for (var content : userMessage.contents()) {
-							tokenCount += estimateTokenCountInText(content.toString());
-						}
-					}
-				} else if (message instanceof AiMessage aiMessage) {
-					tokenCount += estimateTokenCountInText(aiMessage.text());
-				} else if (message instanceof ToolExecutionResultMessage toolExecutionResultMessage) {
-					tokenCount += estimateTokenCountInText(toolExecutionResultMessage.text());
-				} else {
-					tokenCount += estimateTokenCountInText(message.toString());
-				}
-				return tokenCount;
-			}
-
-			@Override
-			public int estimateTokenCountInMessages(Iterable<ChatMessage> messages) {
-				int tokenCount = 3;
-				for (ChatMessage message : messages) {
-					tokenCount += estimateTokenCountInMessage(message);
-				}
-				return tokenCount;
-			}
-		};
 	}
 	
 	// Keep Spring AI Ollama auto-configured, but create the LangChain4j Ollama
@@ -147,6 +95,14 @@ public class LangChain4jConfig {
 				.maxTokens(DEFAULT_MAX_TOKENS, tokenCountEstimator())
 				.chatMemoryStore(persistentChatMemoryStore)
 				.build();
+	}
+	
+	@Bean
+	public TokenCountEstimator tokenCountEstimator() {
+		// LangChain4j 1.11 does not ship a generic tokenizer for Ollama here, so we use a
+		// local token estimator that keeps token-window memory functional without adding
+		// another provider-specific dependency.
+		return new LocalTokenCountEstimator();
 	}
 	
 	@Bean

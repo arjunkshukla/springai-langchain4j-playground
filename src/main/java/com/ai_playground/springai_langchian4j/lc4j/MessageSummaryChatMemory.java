@@ -1,6 +1,7 @@
 package com.ai_playground.springai_langchian4j.lc4j;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import dev.langchain4j.store.memory.chat.ChatMemoryStore;
  */
 public class MessageSummaryChatMemory implements ChatMemory {
 
+	private static final String SUMMARY_PREFIX = "[MEMORY_SUMMARY]\n";
 	private static final String SUMMARY_PROMPT = """
 			Summarize the following conversation for future chat memory.
 			Keep names, decisions, preferences, open questions, and action items.
@@ -87,27 +89,84 @@ public class MessageSummaryChatMemory implements ChatMemory {
 	}
 
 	private List<ChatMessage> compact(List<ChatMessage> messages) {
-		if (messages.size() <= maxMessages) {
-			return messages;
+		if (messages.isEmpty()) {
+			return List.of();
 		}
 
-		// Keep the system message intact if one is present, then summarize the oldest
-		// non-system portion of the conversation and keep the newest turns verbatim.
-		int prefixSize = messages.isEmpty() || !(messages.get(0) instanceof SystemMessage) ? 0 : 1;
-		int messagesToSummarize = messages.size() - maxMessages + 1;
-		int summaryStartIndex = prefixSize;
-		int summaryEndIndex = Math.min(messages.size(), summaryStartIndex + messagesToSummarize);
+		// Keep the original system message, preserve one explicit summary block if it
+		// already exists, and only compact the older raw conversation turns.
+		List<ChatMessage> working = new ArrayList<>(messages);
+		SystemMessage systemMessage = extractSystemMessage(working);
+		ChatMessage summaryMessage = extractSummaryMessage(working);
+		int rawWindowSize = Math.max(1, maxMessages - (systemMessage == null ? 0 : 1) - 1);
 
-		List<ChatMessage> toSummarize = messages.subList(summaryStartIndex, summaryEndIndex);
+		if (summaryMessage != null) {
+			List<ChatMessage> recentRawMessages = tail(working, rawWindowSize);
+			return assemble(systemMessage, summaryMessage, recentRawMessages);
+		}
+
+		int maxRawMessagesWithoutSummary = Math.max(1, maxMessages - (systemMessage == null ? 0 : 1));
+		if (working.size() <= maxRawMessagesWithoutSummary) {
+			return assemble(systemMessage, null, working);
+		}
+
+		int messagesToSummarize = Math.max(1, working.size() - rawWindowSize);
+		List<ChatMessage> toSummarize = working.subList(0, messagesToSummarize);
 		String summaryText = summarize(toSummarize);
+		ChatMessage newSummaryMessage = summaryMessage(summaryText);
+		List<ChatMessage> recentRawMessages = tail(working.subList(messagesToSummarize, working.size()), rawWindowSize);
+		return assemble(systemMessage, newSummaryMessage, recentRawMessages);
+	}
 
+	private List<ChatMessage> assemble(SystemMessage systemMessage, ChatMessage summaryMessage,
+			List<ChatMessage> rawMessages) {
 		List<ChatMessage> compacted = new ArrayList<>();
-		if (prefixSize == 1) {
-			compacted.add(messages.get(0));
+		if (systemMessage != null) {
+			compacted.add(systemMessage);
 		}
-		compacted.add(AiMessage.from("Conversation summary: " + summaryText));
-		compacted.addAll(messages.subList(summaryEndIndex, messages.size()));
+		if (summaryMessage != null) {
+			compacted.add(summaryMessage);
+		}
+		compacted.addAll(rawMessages);
 		return compacted;
+	}
+
+	private List<ChatMessage> tail(List<ChatMessage> messages, int maxCount) {
+		if (messages.size() <= maxCount) {
+			return new ArrayList<>(messages);
+		}
+		return new ArrayList<>(messages.subList(messages.size() - maxCount, messages.size()));
+	}
+
+	private SystemMessage extractSystemMessage(List<ChatMessage> messages) {
+		if (!messages.isEmpty() && messages.get(0) instanceof SystemMessage systemMessage) {
+			messages.remove(0);
+			return systemMessage;
+		}
+		return null;
+	}
+
+	private ChatMessage extractSummaryMessage(List<ChatMessage> messages) {
+		for (Iterator<ChatMessage> iterator = messages.iterator(); iterator.hasNext();) {
+			ChatMessage message = iterator.next();
+			if (isSummaryMessage(message)) {
+				iterator.remove();
+				return message;
+			}
+		}
+		return null;
+	}
+
+	private boolean isSummaryMessage(ChatMessage message) {
+		// Keep the summary as an explicit memory note, not as a normal assistant reply,
+		// so compaction can preserve it without the model treating it like a fresh turn.
+		return message instanceof SystemMessage systemMessage
+				&& systemMessage.text() != null
+				&& systemMessage.text().startsWith(SUMMARY_PREFIX);
+	}
+
+	private ChatMessage summaryMessage(String summaryText) {
+		return SystemMessage.from(SUMMARY_PREFIX + summaryText);
 	}
 
 	private String summarize(List<ChatMessage> messagesToSummarize) {
