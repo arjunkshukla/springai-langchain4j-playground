@@ -4,6 +4,8 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.ai_playground.springai_langchian4j.rag.DocumentReader;
+
 @Configuration
 public class AIConfig {
 
@@ -25,5 +27,10 @@ public class AIConfig {
 																					// called to create the ChatClient
 																					// instance that will be managed by
 																					// Spring.
+	}
+
+	@Bean
+	public DocumentReader simpleIngestion() {
+		return new DocumentReader();
 	}
 }
