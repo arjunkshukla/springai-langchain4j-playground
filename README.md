@@ -37,7 +37,7 @@ The application is configured in `src/main/resources/application.properties` to 
 - embedding provider: `ollama`
 - audio/image/moderation providers: disabled
 - Ollama base URL: `http://localhost:11434`
-- chat model: `llama3`
+- chat model: `llama3.2:1b`
 - embedding model: `nomic-embed-text`
 - PostgreSQL / pgvector: `jdbc:postgresql://localhost:5433/rag`
 
@@ -91,7 +91,7 @@ spring.ai.model.audio.transcription=none
 spring.ai.model.image=none
 spring.ai.model.moderation=none
 spring.ai.ollama.base-url=http://localhost:11434
-spring.ai.ollama.chat.options.model=llama3
+spring.ai.ollama.chat.options.model=llama3.2:1b
 spring.ai.ollama.embedding.options.model=nomic-embed-text
 spring.ai.ollama.embedding.model=nomic-embed-text
 
@@ -101,7 +101,7 @@ spring.datasource.password=test
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 langchain4j.ollama.chat-model.base-url=http://localhost:11434
-langchain4j.ollama.chat-model.model-name=llama3
+langchain4j.ollama.chat-model.model-name=llama3.2:1b
 ```
 
 So the app expects Ollama to already be reachable on port `11434`.
@@ -128,7 +128,7 @@ docker compose ps
 ### Pull the Ollama models
 
 ```powershell
-docker exec -it codebase-ollama-1 ollama pull llama3
+docker exec -it codebase-ollama-1 ollama pull llama3.2:1b
 docker exec -it codebase-ollama-1 ollama pull nomic-embed-text
 ```
 
@@ -187,7 +187,7 @@ The `call()` path is synchronous, so the request thread waits until the model re
 ## Notes
 
 - This is a playground branch, not a production-ready AI service.
-- The local model is `llama3`, so output quality and latency depend on the machine running Ollama.
+- The local model is `llama3.2:1b`, so output quality and latency depend on the machine running Ollama.
 - The `langchain4j` dependency is present in the build, but the current code in this branch does not expose a LangChain4j controller yet.
 - `coredeux-entities.yml` is present as part of the project resources, but the current branch focus is the Spring AI + local Ollama chat flow.
 - `SpringAILangChain4jApplicationTests` uses the `test` profile and Testcontainers so the Spring context can start without depending on your local PostgreSQL container.
