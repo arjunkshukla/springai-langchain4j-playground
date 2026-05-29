@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Coredeux RAG Chat</title>
+	<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+	<div class="app-shell">
+		<aside class="sidebar">
+			<div class="brand">
+				<div class="brand-mark">C</div>
+				<div>
+					<div class="brand-title">Coredeux RAG</div>
+					<div class="brand-subtitle">Local Ollama + pgvector</div>
+				</div>
+			</div>
+
+			<div class="panel">
+				<label for="sessionId">Session</label>
+				<input id="sessionId" type="text" spellcheck="false">
+				<div class="help">Keeps chat memory on the server side.</div>
+			</div>
+
+			<div class="panel">
+				<label for="topK">Retrieved chunks</label>
+				<input id="topK" type="range" min="1" max="8" step="1">
+				<div class="slider-row">
+					<span>1</span>
+					<span id="topKValue"></span>
+					<span>8</span>
+				</div>
+			</div>
+
+			<div class="panel">
+				<div class="meta-label">Endpoint</div>
+				<code>/rag/chat/stream</code>
+				<div class="help">POST question text as the message body. Streams the answer back as it is generated.</div>
+			</div>
+
+			<button id="newSessionBtn" class="secondary-btn" type="button">New session</button>
+		</aside>
+
+		<main class="chat-main">
+			<header class="chat-header">
+				<div>
+					<div class="chat-title">Chat</div>
+					<div class="chat-subtitle">Ask about the indexed docs and the model will answer from retrieved context.</div>
+				</div>
+				<div class="status-pill" id="statusPill">Ready</div>
+			</header>
+
+			<section id="messages" class="messages" aria-live="polite" aria-label="Chat messages"></section>
+
+			<form id="chatForm" class="composer">
+				<textarea id="messageInput" rows="1" placeholder="Ask a question about the docs..."></textarea>
+				<button id="sendBtn" type="submit">Send</button>
+			</form>
+		</main>
+	</div>
+	<script src="/app.js"></script>
+</body>
+</html>

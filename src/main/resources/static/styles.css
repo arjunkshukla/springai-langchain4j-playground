@@ -1,0 +1,254 @@
+:root {
+	--bg: #0f1115;
+	--panel: #161a22;
+	--panel-2: #1d232e;
+	--border: #2a3240;
+	--text: #e8edf5;
+	--muted: #a9b4c4;
+	--accent: #6ea8fe;
+	--accent-strong: #8bbcff;
+	--user-bubble: #253248;
+	--assistant-bubble: #191f28;
+	--shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	min-height: 100%;
+	margin: 0;
+	background: var(--bg);
+	color: var(--text);
+	font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	scrollbar-gutter: stable;
+}
+
+html {
+	overflow-y: scroll;
+}
+
+body {
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
+.app-shell {
+	display: grid;
+	grid-template-columns: 280px minmax(0, 1fr);
+	min-height: 100vh;
+	height: auto;
+	align-items: start;
+}
+
+.sidebar {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	padding: 20px;
+	background: linear-gradient(180deg, #131722 0%, #11151d 100%);
+	border-right: 1px solid var(--border);
+}
+
+.brand {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.brand-mark {
+	width: 40px;
+	height: 40px;
+	border-radius: 10px;
+	background: var(--accent);
+	color: #08111f;
+	font-weight: 800;
+	display: grid;
+	place-items: center;
+}
+
+.brand-title,
+.chat-title {
+	font-size: 18px;
+	font-weight: 700;
+	letter-spacing: 0;
+}
+
+.brand-subtitle,
+.chat-subtitle,
+.help,
+.meta-label,
+.status-pill {
+	font-size: 13px;
+	color: var(--muted);
+}
+
+.panel {
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: 10px;
+	padding: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.panel label {
+	font-size: 12px;
+	color: var(--muted);
+}
+
+.panel input[type="text"] {
+	width: 100%;
+	border: 1px solid var(--border);
+	background: var(--panel-2);
+	color: var(--text);
+	border-radius: 8px;
+	padding: 10px 12px;
+	outline: none;
+}
+
+.panel input[type="range"] {
+	width: 100%;
+	accent-color: var(--accent);
+}
+
+.slider-row {
+	display: flex;
+	justify-content: space-between;
+	font-size: 12px;
+	color: var(--muted);
+}
+
+.secondary-btn,
+.composer button {
+	border: 1px solid var(--border);
+	background: var(--panel);
+	color: var(--text);
+	border-radius: 8px;
+	padding: 10px 14px;
+	cursor: pointer;
+}
+
+.secondary-btn:hover,
+.composer button:hover {
+	border-color: var(--accent);
+}
+
+.chat-main {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	min-height: 100vh;
+}
+
+.chat-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 20px 24px;
+	border-bottom: 1px solid var(--border);
+	background: rgba(15, 17, 21, 0.9);
+	backdrop-filter: blur(10px);
+}
+
+.status-pill {
+	padding: 8px 12px;
+	border: 1px solid var(--border);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.02);
+	white-space: nowrap;
+}
+
+.messages {
+	flex: none;
+	overflow: visible;
+	padding: 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.message {
+	max-width: min(820px, 90%);
+	padding: 14px 16px;
+	border-radius: 12px;
+	border: 1px solid var(--border);
+	line-height: 1.5;
+	white-space: pre-wrap;
+	word-break: break-word;
+	box-shadow: var(--shadow);
+}
+
+.message.user {
+	align-self: flex-end;
+	background: var(--user-bubble);
+}
+
+.message.assistant {
+	align-self: flex-start;
+	background: var(--assistant-bubble);
+}
+
+.message-meta {
+	font-size: 11px;
+	color: var(--muted);
+	margin-bottom: 8px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.composer {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 12px;
+	padding: 20px 24px 24px;
+	border-top: 1px solid var(--border);
+	background: rgba(15, 17, 21, 0.95);
+}
+
+.composer textarea {
+	width: 100%;
+	min-height: 56px;
+	max-height: 180px;
+	resize: none;
+	padding: 16px 14px;
+	border-radius: 10px;
+	border: 1px solid var(--border);
+	background: var(--panel);
+	color: var(--text);
+	outline: none;
+	font: inherit;
+	line-height: 1.5;
+}
+
+.composer button {
+	min-width: 100px;
+	background: var(--accent);
+	color: #08111f;
+	font-weight: 700;
+	border-color: transparent;
+}
+
+.composer button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+	.app-shell {
+		grid-template-columns: 1fr;
+	}
+
+	.sidebar {
+		border-right: none;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.message {
+		max-width: 100%;
+	}
+}
