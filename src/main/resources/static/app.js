@@ -142,4 +142,4 @@ const savedSessionId = localStorage.getItem(STORAGE_KEY);
 setSessionId(savedSessionId || createSessionId());
 topKInput.value = "4";
 updateTopKLabel();
-addMessage("assistant", "Ask a question about the indexed docs. I’ll retrieve context from pgvector and answer from that.", "Assistant");
+addMessage("assistant", "Ask a question about the indexed docs. I'll retrieve context from pgvector and answer from that.", "Assistant");
