@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "f6058171-80a2-45c2-bcef-491fe7d3a42e",
+    "_postman_id": "9d5be5cb-3d2b-4ca7-9b9d-428aca14c928",
     "name": "springai-langchian4j",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "26580886"
@@ -49,6 +49,357 @@
                 {
                   "key": "topic",
                   "value": "Donald Trump"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Document Reader",
+      "item": [
+        {
+          "name": "Text Reader",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/document-reader/text",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "document-reader",
+                "text"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PDF Reader",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/document-reader/pdf",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "document-reader",
+                "pdf"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Directory Reader",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/document-reader/directory",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "document-reader",
+                "directory"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ETL",
+      "item": [
+        {
+          "name": "Default",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/etl",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "etl"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Custom Parameters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/etl?filename=04-reference.pdf&chunkSize=400&minChunkSizeChars=20&minChunkLengthToEmbed=5&maxNumChunks=10000&keepSeparator=true&punctuationMarks=.,?,!",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "etl"
+              ],
+              "query": [
+                {
+                  "key": "filename",
+                  "value": "04-reference.pdf"
+                },
+                {
+                  "key": "chunkSize",
+                  "value": "400"
+                },
+                {
+                  "key": "minChunkSizeChars",
+                  "value": "20"
+                },
+                {
+                  "key": "minChunkLengthToEmbed",
+                  "value": "5"
+                },
+                {
+                  "key": "maxNumChunks",
+                  "value": "10000"
+                },
+                {
+                  "key": "keepSeparator",
+                  "value": "true"
+                },
+                {
+                  "key": "punctuationMarks",
+                  "value": ".,?,!"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Markdown Splitter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/etl?filename=04-reference.md&chunkSize=400&minChunkSizeChars=20&minChunkLengthToEmbed=5&maxNumChunks=10000&keepSeparator=true&punctuationMarks=.,?,!",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "etl"
+              ],
+              "query": [
+                {
+                  "key": "filename",
+                  "value": "04-reference.md"
+                },
+                {
+                  "key": "chunkSize",
+                  "value": "400"
+                },
+                {
+                  "key": "minChunkSizeChars",
+                  "value": "20"
+                },
+                {
+                  "key": "minChunkLengthToEmbed",
+                  "value": "5"
+                },
+                {
+                  "key": "maxNumChunks",
+                  "value": "10000"
+                },
+                {
+                  "key": "keepSeparator",
+                  "value": "true"
+                },
+                {
+                  "key": "punctuationMarks",
+                  "value": ".,?,!"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Embedding",
+      "item": [
+        {
+          "name": "Embed File",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/embed/file?filename=04-reference.pdf",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "embed",
+                "file"
+              ],
+              "query": [
+                {
+                  "key": "filename",
+                  "value": "04-reference.pdf"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Embed Directory",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/embed/directory?dirPath=classpath*:docs/*",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "embed",
+                "directory"
+              ],
+              "query": [
+                {
+                  "key": "dirPath",
+                  "value": "classpath*:docs/*"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Vector",
+      "item": [
+        {
+          "name": "Vectorize Text",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/vector/text?text=Hello World",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "vector",
+                "text"
+              ],
+              "query": [
+                {
+                  "key": "text",
+                  "value": "Hello World"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Query Vector DB",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/vector/query?query=coredeux roadmap",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "vector",
+                "query"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "coredeux roadmap"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RAG",
+      "item": [
+        {
+          "name": "Basic Ask",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{host}}/rag/ask?question=basic coredeux import syntax?&topK=5",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "rag",
+                "ask"
+              ],
+              "query": [
+                {
+                  "key": "question",
+                  "value": "basic coredeux import syntax?"
+                },
+                {
+                  "key": "topK",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Chat",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "want to test your knowledge.. Who am I again and what am I doing?",
+              "options": {
+                "raw": {
+                  "language": "text"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{host}}/rag/chat?sessionId=session-1&topK=5",
+              "host": [
+                "{{host}}"
+              ],
+              "path": [
+                "rag",
+                "chat"
+              ],
+              "query": [
+                {
+                  "key": "sessionId",
+                  "value": "session-1"
+                },
+                {
+                  "key": "topK",
+                  "value": "5"
                 }
               ]
             }
