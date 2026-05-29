@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/naive-rag")
-public class NaivaRagController {
+@RequestMapping("/rag")
+public class RagController {
 
 	private final ChatClient chatClient;
 	private final VectorStore vectorStore;
 	
-	public NaivaRagController(ChatClient chatClient, VectorStore vectorStore) {
+	public RagController(ChatClient chatClient, VectorStore vectorStore) {
 		this.chatClient = chatClient;
 		this.vectorStore = vectorStore;
 	}
