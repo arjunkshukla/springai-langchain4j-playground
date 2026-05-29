@@ -26,8 +26,8 @@ public class DocumentReaderController {
 	
 	private final DocumentReader documentReader;
 
-	public DocumentReaderController(DocumentReader simpleIngestion) {
-		this.documentReader = simpleIngestion;
+	public DocumentReaderController(DocumentReader documentReader) {
+		this.documentReader = documentReader;
 	}
 
 	@GetMapping("/text")
