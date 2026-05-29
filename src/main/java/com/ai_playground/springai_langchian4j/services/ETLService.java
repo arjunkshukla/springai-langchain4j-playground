@@ -20,30 +20,27 @@ public class ETLService {
 		this.documentSplitter = documentSplitter;
 	}
 
-	public List<Document> process(Resource resource, String category) {
+	public List<Document> process(Resource resource) {
 		List<Document> rawDocuments = this.documentReader.tikaReader(resource);
 		for (Document doc : rawDocuments) {
-			doc.getMetadata().put("category", category);
 			doc.getMetadata().put("source", resource.getFilename());
 		}
 		return this.documentSplitter.split(rawDocuments);
 	}
 	
-	public List<Document> process(Resource resource, String category, int chunkSize, int minChunkSizeChars, int minChunkLengthToEmbed,
+	public List<Document> process(Resource resource, int chunkSize, int minChunkSizeChars, int minChunkLengthToEmbed,
 			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks) {
 		List<Document> rawDocuments = this.documentReader.tikaReader(resource);
 		for (Document doc : rawDocuments) {
-			doc.getMetadata().put("category", category);
 			doc.getMetadata().put("source", resource.getFilename());
 		}
 		return this.documentSplitter.split(rawDocuments, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks);
 	}
 	
-	public List<Document> markdownProcess(Resource resource, String category, int chunkSize, int minChunkSizeChars, int minChunkLengthToEmbed,
+	public List<Document> markdownProcess(Resource resource, int chunkSize, int minChunkSizeChars, int minChunkLengthToEmbed,
 			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks) {
 		List<Document> rawDocuments = this.documentReader.tikaReader(resource);
 		for (Document doc : rawDocuments) {
-			doc.getMetadata().put("category", category);
 			doc.getMetadata().put("source", resource.getFilename());
 		}
 		return this.documentSplitter.advanceMarkdownSplitter(rawDocuments, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks);

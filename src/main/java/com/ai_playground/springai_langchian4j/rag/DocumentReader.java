@@ -45,11 +45,11 @@ public class DocumentReader {
 		}
 	}
 
-	private static boolean isReadableDocument(Resource resource) {
+	public static boolean isReadableDocument(Resource resource) {
 		return resource != null && resource.exists() && resource.isReadable();
 	}
 
-	private static String resourceName(Resource resource) {
+	public static String resourceName(Resource resource) {
 		try {
 			String filename = resource.getFilename();
 			if (StringUtils.hasText(filename)) {

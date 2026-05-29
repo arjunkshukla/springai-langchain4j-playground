@@ -28,7 +28,6 @@ public class ETLController {
 	@GetMapping
 	public DocumentPreviewResponse transform(
 			@RequestParam(defaultValue = "04-reference.pdf") String filename,
-			@RequestParam(defaultValue = "etl") String category,
 			@RequestParam(defaultValue = "800") int chunkSize,
 			@RequestParam(defaultValue = "350") int minChunkSizeChars,
 			@RequestParam(defaultValue = "5") int minChunkLengthToEmbed,
@@ -36,7 +35,7 @@ public class ETLController {
 			@RequestParam(defaultValue = "true") boolean keepSeparator,
 			@RequestParam(defaultValue = ".,?,!") List<Character> punctuationMarks) {
 		Resource resource = new ClassPathResource("docs/" + filename);
-		List<Document> documents = etlService.process(resource, category, chunkSize, minChunkSizeChars,
+		List<Document> documents = etlService.process(resource, chunkSize, minChunkSizeChars,
 				minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks);
 		List<DocumentPreview> preview = documents.stream()
 			.map(DocumentPreview::from)
@@ -48,7 +47,6 @@ public class ETLController {
 	@GetMapping("/markdown")
 	public DocumentPreviewResponse transformMarkdown(
 			@RequestParam(defaultValue = "04-reference.md") String filename,
-			@RequestParam(defaultValue = "etl") String category,
 			@RequestParam(defaultValue = "800") int chunkSize,
 			@RequestParam(defaultValue = "350") int minChunkSizeChars,
 			@RequestParam(defaultValue = "5") int minChunkLengthToEmbed,
@@ -56,7 +54,7 @@ public class ETLController {
 			@RequestParam(defaultValue = "true") boolean keepSeparator,
 			@RequestParam(defaultValue = ".,?,!") List<Character> punctuationMarks) {
 		Resource resource = new ClassPathResource("docs/" + filename);
-		List<Document> documents = etlService.markdownProcess(resource, category, chunkSize, minChunkSizeChars,
+		List<Document> documents = etlService.markdownProcess(resource, chunkSize, minChunkSizeChars,
 				minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks);
 		List<DocumentPreview> preview = documents.stream()
 			.map(DocumentPreview::from)

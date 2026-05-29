@@ -7,7 +7,7 @@ The code is intentionally minimal:
 - one Spring Boot application
 - one `ChatClient` bean with a default system prompt
 - one controller with two basic chat endpoints
-- one Docker Compose file for bringing up Ollama locally
+- one Docker Compose file for bringing up Ollama and pgvector locally
 
 It is meant as a lightweight starting point for experimenting with prompt styles, local model configuration, and basic AI-backed HTTP endpoints.
 
@@ -31,15 +31,25 @@ That means every request starts with the same baseline behavior unless the contr
 
 ### Current runtime behavior
 
-The application is configured to use **Ollama** for Spring AI:
+The application is configured in `src/main/resources/application.properties` to use **Ollama** for Spring AI:
 
 - chat model provider: `ollama`
 - embedding provider: `ollama`
 - audio/image/moderation providers: disabled
 - Ollama base URL: `http://localhost:11434`
-- default model: `llama3`
+- chat model: `llama3`
+- embedding model: `nomic-embed-text`
+- PostgreSQL / pgvector: `jdbc:postgresql://localhost:5433/rag`
 
 The `langchain4j` dependency is still present in the build, but the current branch code path is focused on the Spring AI `ChatClient` controller flow.
+
+If you want to inspect pgvector from pgAdmin or another local Postgres client, connect to:
+
+- host: `localhost`
+- port: `5433`
+- database: `rag`
+- username: `test`
+- password: `test`
 
 ## Project structure
 
@@ -71,7 +81,7 @@ The build is set up for Java 21.
 
 ## Configuration
 
-The application properties are already set up for local Ollama:
+The application properties are already set up for local Ollama and local pgvector:
 
 ```properties
 spring.ai.model.chat=ollama
@@ -82,7 +92,13 @@ spring.ai.model.image=none
 spring.ai.model.moderation=none
 spring.ai.ollama.base-url=http://localhost:11434
 spring.ai.ollama.chat.options.model=llama3
-spring.ai.ollama.embedding.options.model=llama3
+spring.ai.ollama.embedding.options.model=nomic-embed-text
+spring.ai.ollama.embedding.model=nomic-embed-text
+
+spring.datasource.url=jdbc:postgresql://localhost:5433/rag
+spring.datasource.username=test
+spring.datasource.password=test
+spring.datasource.driver-class-name=org.postgresql.Driver
 
 langchain4j.ollama.chat-model.base-url=http://localhost:11434
 langchain4j.ollama.chat-model.model-name=llama3
@@ -90,47 +106,47 @@ langchain4j.ollama.chat-model.model-name=llama3
 
 So the app expects Ollama to already be reachable on port `11434`.
 
-## Running Ollama locally
+## Running the containers locally
 
-`compose.yaml` brings up an Ollama container with a fixed container name:
+`compose.yaml` now brings up two containers:
 
-```yaml
-container_name: codebase-ollama-1
-```
+- Ollama for local chat and embeddings
+- pgvector for vector storage during tests and local runs
 
-### Start Ollama
+### Start the stack
 
 ```powershell
-docker compose -f compose.yaml up -d
+docker compose up -d
 ```
 
 ### Check that it is running
 
 ```powershell
-docker compose -f compose.yaml ps
+docker compose ps
 ```
 
-### Run the model inside the container
+### Pull the Ollama models
 
 ```powershell
-docker exec -it codebase-ollama-1 ollama run llama3
+docker exec -it codebase-ollama-1 ollama pull llama3
+docker exec -it codebase-ollama-1 ollama pull nomic-embed-text
 ```
 
-### Stop Ollama
+### Stop the stack
 
 ```powershell
-docker compose -f compose.yaml down
+docker compose down
 ```
 
 ## Running the app
 
-From the project root:
+Run the Spring Boot app from the project root:
 
 ```powershell
 mvn spring-boot:run
 ```
 
-Or run the packaged application from your IDE.
+This is the easiest local flow when Docker is only providing Ollama and pgvector.
 
 ## HTTP endpoints
 
@@ -174,6 +190,8 @@ The `call()` path is synchronous, so the request thread waits until the model re
 - The local model is `llama3`, so output quality and latency depend on the machine running Ollama.
 - The `langchain4j` dependency is present in the build, but the current code in this branch does not expose a LangChain4j controller yet.
 - `coredeux-entities.yml` is present as part of the project resources, but the current branch focus is the Spring AI + local Ollama chat flow.
+- `SpringAILangChain4jApplicationTests` uses the `test` profile and Testcontainers so the Spring context can start without depending on your local PostgreSQL container.
+- The `PgVectorRagIntegrationTest` uses Testcontainers to spin up pgvector and verify vector storage.
 
 ## Useful files
 
