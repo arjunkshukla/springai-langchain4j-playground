@@ -1,10 +1,12 @@
 package com.ai_playground.springai_langchian4j.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,9 +30,10 @@ public class EmbeddingController {
 			@RequestParam(defaultValue = "5") int minChunkLengthToEmbed,
 			@RequestParam(defaultValue = "10000") int maxNumChunks,
 			@RequestParam(defaultValue = "true") boolean keepSeparator,
-			@RequestParam(defaultValue = ".,?,!") List<Character> punctuationMarks) {
+			@RequestParam(defaultValue = ".,?,!") List<Character> punctuationMarks,
+			@RequestBody(required = false)  Map<String, Object> metadata) {
 		this.embeddingService.embedResource(filename, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks,
-				keepSeparator, punctuationMarks);
+				keepSeparator, punctuationMarks, metadata);
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 
@@ -41,9 +44,10 @@ public class EmbeddingController {
 			@RequestParam(defaultValue = "5") int minChunkLengthToEmbed,
 			@RequestParam(defaultValue = "10000") int maxNumChunks,
 			@RequestParam(defaultValue = "true") boolean keepSeparator,
-			@RequestParam(defaultValue = ".,?,!") List<Character> punctuationMarks) {
+			@RequestParam(defaultValue = ".,?,!") List<Character> punctuationMarks,
+			@RequestBody(required = false)  Map<String, Object> metadata) {
 		this.embeddingService.embedDirectory(dirPath, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks,
-				keepSeparator, punctuationMarks);
+				keepSeparator, punctuationMarks, metadata);
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 

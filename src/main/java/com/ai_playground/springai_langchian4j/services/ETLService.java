@@ -1,6 +1,7 @@
 package com.ai_playground.springai_langchian4j.services;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.ai.document.Document;
 import org.springframework.core.io.Resource;
@@ -20,28 +21,37 @@ public class ETLService {
 		this.documentSplitter = documentSplitter;
 	}
 
-	public List<Document> process(Resource resource) {
+	public List<Document> process(Resource resource, Map<String, Object> metadata) {
 		List<Document> rawDocuments = this.documentReader.tikaReader(resource);
 		for (Document doc : rawDocuments) {
 			doc.getMetadata().put("source", resource.getFilename());
-		}
+			if(metadata != null && !metadata.isEmpty()) {
+				doc.getMetadata().putAll(metadata);
+			}
+		}	
 		return this.documentSplitter.split(rawDocuments);
 	}
 	
 	public List<Document> process(Resource resource, int chunkSize, int minChunkSizeChars, int minChunkLengthToEmbed,
-			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks) {
+			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks, Map<String, Object> metadata) {
 		List<Document> rawDocuments = this.documentReader.tikaReader(resource);
 		for (Document doc : rawDocuments) {
 			doc.getMetadata().put("source", resource.getFilename());
+			if(metadata != null && !metadata.isEmpty()) {
+				doc.getMetadata().putAll(metadata);
+			}
 		}
 		return this.documentSplitter.split(rawDocuments, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks);
 	}
 	
 	public List<Document> markdownProcess(Resource resource, int chunkSize, int minChunkSizeChars, int minChunkLengthToEmbed,
-			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks) {
+			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks, Map<String, Object> metadata) {
 		List<Document> rawDocuments = this.documentReader.tikaReader(resource);
 		for (Document doc : rawDocuments) {
 			doc.getMetadata().put("source", resource.getFilename());
+			if(metadata != null && !metadata.isEmpty()) {
+				doc.getMetadata().putAll(metadata);
+			}
 		}
 		return this.documentSplitter.advanceMarkdownSplitter(rawDocuments, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks);
 	}

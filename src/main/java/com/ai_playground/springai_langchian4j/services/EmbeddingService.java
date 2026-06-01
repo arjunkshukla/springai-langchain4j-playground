@@ -3,6 +3,7 @@ package com.ai_playground.springai_langchian4j.services;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.ai.document.Document;
@@ -58,22 +59,22 @@ public class EmbeddingService {
 	}
 	
 	public void embedResource(String filename, int chunkSize, int minChunkSizeChars, int minChunkLengthToEmbed,
-			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks) {
+			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks, Map<String, Object> metadata) {
 		Resource resource = new ClassPathResource("docs/" + filename);
-		this.vectorStore.add(etlService.process(resource, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks));
+		this.vectorStore.add(etlService.process(resource, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks, metadata));
 	}
 	
-	public void embedResource(String filename) {
+	public void embedResource(String filename, Map<String, Object> metadata) {
 		Resource resource = new ClassPathResource("docs/" + filename);
-		this.vectorStore.add(etlService.process(resource));
+		this.vectorStore.add(etlService.process(resource, metadata));
 	}
 	
-	public void embedDirectory(String pathPattern) {
+	public void embedDirectory(String pathPattern, Map<String, Object> metadata) {
 		try {
 			Resource[] resources = this.resourcePatternResolver.getResources(pathPattern);
 			for (Resource resource : resources) {
 				if (DocumentReader.isReadableDocument(resource)) {
-					this.vectorStore.add(etlService.process(resource));
+					this.vectorStore.add(etlService.process(resource, metadata));
 				}
 			}
 		}
@@ -83,12 +84,12 @@ public class EmbeddingService {
 	}
 	
 	public void embedDirectory(String pathPattern, int chunkSize, int minChunkSizeChars, int minChunkLengthToEmbed,
-			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks) {
+			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks, Map<String, Object> metadata) {
 		try {
 			Resource[] resources = this.resourcePatternResolver.getResources(pathPattern);
 			for (Resource resource : resources) {
 				if (DocumentReader.isReadableDocument(resource)) {
-					this.vectorStore.add(etlService.process(resource, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks));
+					this.vectorStore.add(etlService.process(resource, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks, metadata));
 				}
 			}
 		}

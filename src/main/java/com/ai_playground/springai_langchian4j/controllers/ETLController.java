@@ -1,11 +1,13 @@
 package com.ai_playground.springai_langchian4j.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.ai.document.Document;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,10 +35,12 @@ public class ETLController {
 			@RequestParam(defaultValue = "5") int minChunkLengthToEmbed,
 			@RequestParam(defaultValue = "10000") int maxNumChunks,
 			@RequestParam(defaultValue = "true") boolean keepSeparator,
-			@RequestParam(defaultValue = ".,?,!") List<Character> punctuationMarks) {
+			@RequestParam(defaultValue = ".,?,!") List<Character> punctuationMarks,
+			@RequestBody(required = false)  Map<String, Object> metadata
+			) {
 		Resource resource = new ClassPathResource("docs/" + filename);
 		List<Document> documents = etlService.process(resource, chunkSize, minChunkSizeChars,
-				minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks);
+				minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks, metadata);
 		List<DocumentPreview> preview = documents.stream()
 			.map(DocumentPreview::from)
 			.toList();
@@ -52,10 +56,11 @@ public class ETLController {
 			@RequestParam(defaultValue = "5") int minChunkLengthToEmbed,
 			@RequestParam(defaultValue = "10000") int maxNumChunks,
 			@RequestParam(defaultValue = "true") boolean keepSeparator,
-			@RequestParam(defaultValue = ".,?,!") List<Character> punctuationMarks) {
+			@RequestParam(defaultValue = ".,?,!") List<Character> punctuationMarks,
+			@RequestBody(required = false)  Map<String, Object> metadata) {
 		Resource resource = new ClassPathResource("docs/" + filename);
 		List<Document> documents = etlService.markdownProcess(resource, chunkSize, minChunkSizeChars,
-				minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks);
+				minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks, metadata);
 		List<DocumentPreview> preview = documents.stream()
 			.map(DocumentPreview::from)
 			.toList();
