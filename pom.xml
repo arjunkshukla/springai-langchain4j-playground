@@ -40,6 +40,7 @@
         <!-- BOM versions exposed as properties -->
         <spring.ai.bom.version>1.1.6</spring.ai.bom.version>
         <langchain4j.bom.version>0.35.0</langchain4j.bom.version>
+        <lombok.version>1.18.46</lombok.version>
     </properties>
 
     <!-- Repositories required to resolve snapshot/milestone Spring artifacts -->
@@ -132,6 +133,17 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-openai</artifactId>
         </dependency>
@@ -212,6 +224,13 @@
                 <version>3.11.0</version>
                 <configuration>
                     <release>${java.version}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin>

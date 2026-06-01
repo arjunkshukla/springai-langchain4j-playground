@@ -5,12 +5,16 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class AIConfig {
+	
+	@Value("${chat.memory.messages.window.size:10}")
+	private Integer messageWindowSize;
 
 	// This method defines a Spring Bean for the ChatClient,
 	// which is used to interact with the AI.
@@ -40,7 +44,7 @@ public class AIConfig {
 	public ChatMemory persistedChatMemory(ChatMemoryRepository chatMemoryRepository) {
 		// This keeps the Spring AI memory demo intact, but swaps the backing store from
 		// a volatile in-memory map to the JDBC repository so we can verify persistence.
-		return MessageWindowChatMemory.builder().maxMessages(10).chatMemoryRepository(chatMemoryRepository).build();
+		return MessageWindowChatMemory.builder().maxMessages(messageWindowSize).chatMemoryRepository(chatMemoryRepository).build();
 	}
 
 	// This ChatClient bean is configured with a MessageChatMemoryAdvisor that uses
