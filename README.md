@@ -25,6 +25,7 @@ git switch base-example-with-local-llama
 | `multi-provider-strategy` | Provider routing at request time, letting the same endpoints choose between OpenAI and local Ollama. |
 | `managinig-io-prompttemplate-converters` | Prompt templates, SpEL rendering, structured output, list/map extraction, streaming, and browser streaming demos. |
 | `memory-and-context-management` | A memory-focused Spring AI and LangChain4j lab covering manual memory, in-memory chat, JDBC-backed Spring AI memory, SQL-persisted LangChain4j memory, token-window and sliding-window strategies, summarization memory, and Redis-backed chat memory. |
+| `rag-fundamentals` | The local Spring AI RAG playground: document ingestion, Tika-based reading, token and markdown-aware splitting, pgvector storage, query rewriting, tenant/clearance filtering, persisted chat memory, streaming chat UI, and the Postman collection for exploring the APIs. |
 
 ## Where to start
 
@@ -35,6 +36,7 @@ If you want:
 - runtime provider switching between OpenAI and Ollama, switch to `multi-provider-strategy`
 - prompt templating, structured output, and streaming experiments, switch to `managinig-io-prompttemplate-converters`
 - memory and context experiments across Spring AI, LangChain4j, Postgres, Redis, and OpenAI summarization, switch to `memory-and-context-management`
+- the local RAG playground with pgvector, document ingestion, and the streaming browser UI, switch to `rag-fundamentals`
 
 ## Why the branches are split this way
 
