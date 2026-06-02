@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ai_playground.springai_langchian4j.services.EmbeddingService;
 
+/**
+ * Exposes endpoints that write documents into pgvector.
+ */
 @RestController
 @RequestMapping("/embed")
 public class EmbeddingController {
@@ -23,6 +26,10 @@ public class EmbeddingController {
 		this.embeddingService = embeddingService;
 	}
 
+	/**
+	 * Reads one document from the classpath, splits it, and stores the chunks in
+	 * the vector store.
+	 */
 	@GetMapping("/file")
 	public ResponseEntity<HttpStatus> embedFile(@RequestParam String filename,
 			@RequestParam(defaultValue = "800") int chunkSize,
@@ -37,6 +44,10 @@ public class EmbeddingController {
 		return ResponseEntity.ok(HttpStatus.OK);
 	}
 
+	/**
+	 * Scans a classpath directory pattern and stores every readable document it
+	 * finds.
+	 */
 	@GetMapping("/directory")
 	public ResponseEntity<HttpStatus> embedDirectory(@RequestParam String dirPath,
 			@RequestParam(defaultValue = "800") int chunkSize,

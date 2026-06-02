@@ -13,6 +13,9 @@ import com.ai_playground.springai_langchian4j.rag.DocumentReader;
 import com.ai_playground.springai_langchian4j.rag.data.DocumentPreview;
 import com.ai_playground.springai_langchian4j.rag.data.DocumentPreviewResponse;
 
+/**
+ * Debug endpoints that show how the different readers extract text.
+ */
 @RestController
 @RequestMapping("/document-reader")
 public class DocumentReaderController {
@@ -30,6 +33,9 @@ public class DocumentReaderController {
 		this.documentReader = documentReader;
 	}
 
+	/**
+	 * Reads the sample text file using Spring AI's plain-text reader.
+	 */
 	@GetMapping("/text")
 	public DocumentPreviewResponse text() {
 		List<Document> documents = this.documentReader.textReader(textResource);
@@ -39,6 +45,9 @@ public class DocumentReaderController {
 		return new DocumentPreviewResponse(documents.size(), preview);
 	}
 	
+	/**
+	 * Reads the sample PDF using the Tika-based reader.
+	 */
 	@GetMapping("/pdf")
 	public DocumentPreviewResponse pdf() {
 		List<Document> documents = this.documentReader.tikaReader(pdfResource);
@@ -48,6 +57,9 @@ public class DocumentReaderController {
 		return new DocumentPreviewResponse(documents.size(), preview);
 	}
 	
+	/**
+	 * Reads every readable document under {@code classpath*:docs/*}.
+	 */
 	@GetMapping("/directory")
 	public DocumentPreviewResponse documents() {
 		List<Document> documents = this.documentReader.directoryReader("classpath*:docs/*");

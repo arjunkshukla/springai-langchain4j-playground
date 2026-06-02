@@ -14,9 +14,17 @@ import org.springframework.context.annotation.Primary;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
+/**
+ * Test-only configuration that wires pgvector and a deterministic embedding
+ * model for repeatable integration tests.
+ */
 @TestConfiguration(proxyBeanMethods = false)
 public class PgVectorTestConfiguration {
 
+	/**
+	 * Starts a pgvector-enabled PostgreSQL container and exposes it through Spring
+	 * Boot's service connection support.
+	 */
 	@Bean
 	@ServiceConnection
 	PostgreSQLContainer<?> pgvectorContainer() {
@@ -27,6 +35,10 @@ public class PgVectorTestConfiguration {
 			.withPassword("test");
 	}
 
+	/**
+	 * Replaces the production embedding model with a tiny deterministic model so
+	 * the test can assert retrieval behavior without calling Ollama.
+	 */
 	@Bean
 	@Primary
 	EmbeddingModel testEmbeddingModel() {

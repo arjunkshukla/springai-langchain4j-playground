@@ -671,31 +671,50 @@ http://localhost:8080/
 
 The root path forwards to the streaming chat UI.
 
+## Postman collection
+
+The repo includes a Postman collection at [`postman_collections/springai-langchian4j.postman_collection.json`](postman_collections/springai-langchian4j.postman_collection.json).
+
+It mirrors the app's API groups:
+
+- `Basics` for plain chat endpoints
+- `Document Reader` for raw extraction
+- `ETL` for chunking and markdown-aware transformation
+- `Embedding` for writing chunks into pgvector
+- `Vector` for embedding and similarity-search checks
+- `RAG` for the retrieval-augmented chat flows
+
+Use it when you want to see the exact request shape for each controller without reading the code first.
+
 ## Endpoint reference
 
 ### Chat and RAG
 
-- `GET /ask?question=...`
-- `GET /joke?topic=...`
-- `GET /rag/ask?question=...&topK=4`
-- `POST /rag/chat?sessionId=...&topK=4`
-- `POST /rag/chat/stream?sessionId=...&topK=4`
+These are the most important endpoints if you want to understand the user-facing flows.
+
+- `GET /ask?question=...` - plain chat against the model, no retrieval
+- `GET /joke?topic=...` - prompt shaping example with a custom system prompt
+- `GET /rag/ask?question=...&topK=4` - simple one-shot RAG answer using vector search
+- `POST /rag/chat?sessionId=...&topK=4&tenant_id=...&clearance=...` - persisted-memory RAG chat with query rewriting and metadata filtering
+- `POST /rag/chat/stream?sessionId=...&topK=4&tenant_id=...&clearance=...` - same retrieval flow, but streams the answer into the browser UI
+
+The `tenant_id` and `clearance` parameters matter because the retriever filters chunks using metadata before anything reaches the model.
 
 ### Embeddings and vectors
 
-- `GET /embed/file?filename=...`
-- `GET /embed/directory?dirPath=...`
-- `GET /vector/text?text=...`
-- `GET /vector/query?query=...`
+- `GET /embed/file?filename=...` - read one document, split it, and store the chunks in pgvector
+- `GET /embed/directory?dirPath=...` - ingest every readable document under a classpath pattern
+- `GET /vector/text?text=...` - sanity-check the embedding model and vector dimensions
+- `GET /vector/query?query=...` - run a similarity search and return compact document previews
 
 ### Document reading and transformation
 
-- `GET /document-reader/text`
-- `GET /document-reader/pdf`
-- `GET /document-reader/directory`
-- `GET /document-splitter/split`
-- `GET /etl`
-- `GET /etl/markdown`
+- `GET /document-reader/text` - read the sample text file with `TextReader`
+- `GET /document-reader/pdf` - read the sample PDF with `TikaDocumentReader`
+- `GET /document-reader/directory` - read every readable file under `classpath*:docs/*`
+- `GET /document-splitter/split` - split the sample PDF with the default `TokenTextSplitter`
+- `GET /etl` - read and chunk a file with configurable token-split settings
+- `GET /etl/markdown` - apply the custom markdown-aware transformer before token chunking
 
 ## Why the custom transformer matters
 
@@ -718,4 +737,3 @@ That is a small change in code, but it makes a noticeable difference in RAG qual
 - `nomic-embed-text` is used for embeddings because it is a common local embedding model and works well with pgvector.
 - The browser UI streams answers progressively so the user sees the model working instead of waiting for one big final response.
 - The project still includes LangChain4j as a dependency, but the current implementation path is centered on Spring AI.
-

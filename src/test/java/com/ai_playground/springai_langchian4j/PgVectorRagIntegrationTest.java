@@ -15,6 +15,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import com.ai_playground.springai_langchian4j.config.PgVectorTestConfiguration;
 
+/**
+ * End-to-end check that documents can be stored in pgvector and retrieved back
+ * with semantic search.
+ */
 @SpringBootTest
 @ActiveProfiles("test")
 @Import(PgVectorTestConfiguration.class)
@@ -23,6 +27,10 @@ class PgVectorRagIntegrationTest {
 	@Autowired
 	private VectorStore vectorStore;
 
+	/**
+	 * Stores a couple of sample documents and confirms the most relevant one is
+	 * returned by similarity search.
+	 */
 	@Test
 	void storesAndRetrievesDocumentsFromPgVector() {
 		this.vectorStore.add(List.of(

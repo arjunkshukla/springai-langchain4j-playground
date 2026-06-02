@@ -13,6 +13,9 @@ import com.ai_playground.springai_langchian4j.rag.DocumentSplitter;
 import com.ai_playground.springai_langchian4j.rag.data.DocumentPreview;
 import com.ai_playground.springai_langchian4j.rag.data.DocumentPreviewResponse;
 
+/**
+ * Simple inspection endpoint for the splitter behavior.
+ */
 @RestController
 @RequestMapping("/document-splitter")
 public class DocumentSplitterController {
@@ -26,6 +29,9 @@ public class DocumentSplitterController {
 		this.documentSplitter = documentSplitter;
 	}
 
+	/**
+	 * Splits the bundled reference PDF with the default token splitter settings.
+	 */
 	@GetMapping("/split")
 	public DocumentPreviewResponse split() {
 		List<Document> documents = this.documentSplitter.split(pdfResource);

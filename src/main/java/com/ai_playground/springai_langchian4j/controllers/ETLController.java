@@ -16,6 +16,9 @@ import com.ai_playground.springai_langchian4j.rag.data.DocumentPreview;
 import com.ai_playground.springai_langchian4j.rag.data.DocumentPreviewResponse;
 import com.ai_playground.springai_langchian4j.services.ETLService;
 
+/**
+ * Lets you inspect how the ingestion pipeline reads and splits documents.
+ */
 @RestController
 @RequestMapping("/etl")
 public class ETLController {
@@ -27,6 +30,9 @@ public class ETLController {
 		this.etlService = etlService;
 	}
 
+	/**
+	 * Runs the standard token-based ETL pipeline against a classpath document.
+	 */
 	@GetMapping
 	public DocumentPreviewResponse transform(
 			@RequestParam(defaultValue = "04-reference.pdf") String filename,
@@ -47,7 +53,10 @@ public class ETLController {
 		return new DocumentPreviewResponse(documents.size(), preview);
 	}
 	
-
+	/**
+	 * Runs the markdown-aware ETL pipeline so markdown headings stay visible in
+	 * the resulting chunks.
+	 */
 	@GetMapping("/markdown")
 	public DocumentPreviewResponse transformMarkdown(
 			@RequestParam(defaultValue = "04-reference.md") String filename,

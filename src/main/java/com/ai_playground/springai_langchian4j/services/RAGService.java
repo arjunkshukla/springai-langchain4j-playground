@@ -13,8 +13,16 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter.Expression;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
 
+/**
+ * Encapsulates retrieval-augmented generation concerns for the app.
+ *
+ * <p>The service owns two pieces of the RAG pipeline: vector retrieval with
+ * metadata filters and the final streamed answer generation.</p>
+ */
 @Service
 public class RAGService {
 
@@ -26,7 +34,17 @@ public class RAGService {
 		this.persistedChatClient = persistedChatClient;
 	}
 	
-	public String retrieveContext(String message, int topK, double similarityThreshold) {
+	/**
+	 * Retrieves only the chunks allowed by tenant and clearance metadata.
+	 *
+	 * <p>This is the important security hook in the demo: even if a document is a
+	 * semantic match, it is filtered out unless the metadata matches the caller's
+	 * tenant and clearance values.</p>
+	 */
+	public String retrieveContext(String message, int topK, double similarityThreshold, String tenantId, String clearance) {
+		FilterExpressionBuilder fb = new FilterExpressionBuilder();
+		Expression filterExpression = fb.and(fb.eq("tenant_id", tenantId), fb.eq("clearance", clearance))// Filtering Chunks based on tenant_id and clearance level, which are stored as metadata in the vector store.
+				.build();
 		List<Document> documents = this.vectorStore.similaritySearch(SearchRequest.builder()
 				.query(message)
 				.topK(topK)//This is the number of top similar documents to retrieve from the vector store. 
@@ -34,6 +52,7 @@ public class RAGService {
 						   //A common choice is between 3 to 5, but you can experiment with different values to see what works best for your application.
 				.similarityThreshold(similarityThreshold)//This helps to enable Hybrid search by enable Keyword Search using BM25 algorithm and then filter the results using the similarity threshold. 
 										//This way, we can get relevant results even if they are not very similar in vector space, as long as they match the keywords in the query.
+				.filterExpression(filterExpression)
 				.build());
 
 		return documents.stream()
@@ -41,6 +60,13 @@ public class RAGService {
 			.collect(Collectors.joining("\n\n---\n\n"));
 	}
 
+	/**
+	 * Streams the final assistant answer back to the HTTP response body.
+	 *
+	 * <p>Chunks are written as they arrive so the browser can render a live
+	 * typing-style response instead of waiting for the whole generation to
+	 * finish.</p>
+	 */
 	public void streamChat(String sessionId, String message, String retrievedContext, OutputStream outputStream) throws IOException {
 		var responseStream = persistedChatClient.prompt()
 				.system("""
@@ -59,6 +85,8 @@ public class RAGService {
 		CountDownLatch finished = new CountDownLatch(1);
 		AtomicReference<Throwable> error = new AtomicReference<>();
 
+		// Subscribe to the reactive stream and push each chunk directly to the HTTP
+		// response so the UI can update incrementally.
 		responseStream.subscribe(
 				chunk -> {
 					try {

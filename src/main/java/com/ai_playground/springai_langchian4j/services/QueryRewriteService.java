@@ -8,6 +8,13 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.stereotype.Service;
 
+/**
+ * Rewrites follow-up user questions into standalone search queries.
+ *
+ * <p>This is the query-understanding step that runs before vector retrieval so
+ * a vague follow-up question can still use the right context from chat
+ * history.</p>
+ */
 @Service
 public class QueryRewriteService {
 
@@ -36,10 +43,18 @@ public class QueryRewriteService {
 		this.chatClient = chatClient;
 	}
 
+	/**
+	 * Rewrites a question using the persisted conversation history for the given
+	 * session.
+	 *
+	 * <p>If there is no history, the original query is returned unchanged. When
+	 * history exists, the model is instructed to return only the rewritten query
+	 * text, not an answer.</p>
+	 */
 	public String rewrite(String sessionId, String query) {
 		List<Message> conversations = persistedChatMemory.get(sessionId);
 		if(null == conversations || conversations.isEmpty()) {
-			return query;// If there is no conversation history, return the original query as is.
+			return query;
 		}
 		
 
@@ -57,7 +72,10 @@ public class QueryRewriteService {
 		return question.question();
 	}
 	
-
+	/**
+	 * Minimal structured response used to coerce the rewrite model into returning
+	 * only the rewritten query text.
+	 */
 	public record Question(String question) {
 	
 	}

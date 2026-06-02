@@ -5,48 +5,39 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Tiny "hello world" style chat endpoints for exploring the raw chat client.
+ */
 @RestController
 public class GenerativeController {
 
-	// The ChatClient is injected into the controller via constructor injection.
-	// This allows the controller to use the ChatClient to interact with the AI for
-	// generating responses based on user input.
 	private final ChatClient chatClient;
 
 	public GenerativeController(ChatClient chatClient) {
 		this.chatClient = chatClient;
 	}
 
-	// This endpoint allows users to ask any question to the AI and get a response.
-	// The question is passed as a query parameter, and the AI's response is
-	// returned as a plain string.
+	/**
+	 * Sends a one-off prompt to the assistant with no RAG context.
+	 */
 	@GetMapping("/ask")
 	public String askAI(@RequestParam String question) {
-		return chatClient.prompt()// Initiates the prompt-building process for a chat interaction with the AI.
-				.user(question)// Sets the "User Prompt" (the actual question or request)
-				.call()// Executes the request synchronously, sending the constructed prompt to the AI
-						// and waiting for a response. This blocks the thread until the AI responds.
-				.content();// Extracts the content of the AI's response as String body discarding any
-							// additional metadata or information that may be included in the response
-							// object like tokens used, response time, etc.
+		return chatClient.prompt()
+				.user(question)
+				.call()
+				.content();
 	}
 
-	// This endpoint is specifically designed to generate jokes based on a given
-	// topic. It sets a system prompt to instruct the AI to act as a comedian and be
-	// sarcastic and funny, then constructs a user prompt asking for a joke about
-	// the specified topic. The AI's response is returned as a plain string.
+	/**
+	 * Demonstrates prompt shaping with a custom system instruction.
+	 */
 	@GetMapping("/joke")
 	public String tellJoke(@RequestParam String topic) {
-		return chatClient.prompt()// Initiates the prompt-building process for a chat interaction with the AI.
-				.system("You are a comedian. Be sarcastic and funny.")// Sets the "System Prompt" (sets the context for
-																		// the AI, telling it to act as a comedian)
-				.user(u -> u.text("Tell me a joke about {topic}")// Sets the "User Prompt" (the actual question or
-																	// request, with a placeholder for the topic)
+		return chatClient.prompt()
+				.system("You are a comedian. Be sarcastic and funny.")
+				.user(u -> u.text("Tell me a joke about {topic}")
 						.param("topic", topic))
-				.call()// Executes the request synchronously, sending the constructed prompt to the AI
-						// and waiting for a response. This blocks the thread until the AI responds.
-				.content();// Extracts the content of the AI's response as String body discarding any
-							// additional metadata or information that may be included in the response
-							// object like tokens used, response time, etc.
+				.call()
+				.content();
 	}
 }

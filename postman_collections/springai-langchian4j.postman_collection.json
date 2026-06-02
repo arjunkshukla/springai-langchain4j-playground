@@ -237,11 +237,23 @@
       "item": [
         {
           "name": "Embed File",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
           "request": {
             "method": "GET",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"clearance\" : \"protected\",\r\n    \"tenant_id\" : \"tenant-2\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
-              "raw": "{{host}}/embed/file?filename=04-reference.pdf",
+              "raw": "{{host}}/embed/file?filename=Questioner for AB-inbev_Algosoft_Ans.pdf",
               "host": [
                 "{{host}}"
               ],
@@ -252,7 +264,7 @@
               "query": [
                 {
                   "key": "filename",
-                  "value": "04-reference.pdf"
+                  "value": "Questioner for AB-inbev_Algosoft_Ans.pdf"
                 }
               ]
             }
@@ -261,9 +273,21 @@
         },
         {
           "name": "Embed Directory",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
           "request": {
             "method": "GET",
             "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"clearance\" : \"general\",\r\n    \"tenant_id\" : \"tenant-1\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{host}}/embed/directory?dirPath=classpath*:docs/*",
               "host": [
@@ -347,7 +371,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{host}}/rag/ask?question=basic coredeux import syntax?&topK=5",
+              "raw": "{{host}}/rag/ask?question=basic coredeux import syntax?&topK=5&similarityThreshold=0.0",
               "host": [
                 "{{host}}"
               ],
@@ -363,6 +387,10 @@
                 {
                   "key": "topK",
                   "value": "5"
+                },
+                {
+                  "key": "similarityThreshold",
+                  "value": "0.0"
                 }
               ]
             }
@@ -376,7 +404,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "want to test your knowledge.. Who am I again and what am I doing?",
+              "raw": "what is Coredeux?",
               "options": {
                 "raw": {
                   "language": "text"
@@ -384,7 +412,7 @@
               }
             },
             "url": {
-              "raw": "{{host}}/rag/chat?sessionId=session-1&topK=5",
+              "raw": "{{host}}/rag/chat?sessionId=session-1&topK=5&similarityThreshold=0.0&tenant_id=tenant-1&clearance=general",
               "host": [
                 "{{host}}"
               ],
@@ -400,6 +428,18 @@
                 {
                   "key": "topK",
                   "value": "5"
+                },
+                {
+                  "key": "similarityThreshold",
+                  "value": "0.0"
+                },
+                {
+                  "key": "tenant_id",
+                  "value": "tenant-1"
+                },
+                {
+                  "key": "clearance",
+                  "value": "general"
                 }
               ]
             }

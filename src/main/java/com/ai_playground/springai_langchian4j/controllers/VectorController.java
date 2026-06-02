@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ai_playground.springai_langchian4j.rag.data.DocumentPreview;
 import com.ai_playground.springai_langchian4j.rag.data.DocumentPreviewResponse;
 
+/**
+ * Exposes small vector-store experiments for embeddings and similarity search.
+ */
 @RestController
 @RequestMapping("/vector")
 public class VectorController {
@@ -27,12 +30,20 @@ public class VectorController {
 		this.vectorStore = vectorStore;
 	}
 	
+	/**
+	 * Embeds a single text string and returns the vector size as a quick sanity
+	 * check.
+	 */
 	@GetMapping("/text")
 	public Map<String, Object> embedText(@RequestParam String text) {
 		float[] vector = this.embeddingModel.embed(text);
 		return Map.of("text", text, "vectorSize", vector.length);
 	}
 	
+	/**
+	 * Performs a small similarity search and returns compact previews of the
+	 * matching documents.
+	 */
 	@GetMapping("/query")
 	public DocumentPreviewResponse query(@RequestParam String query) {
 		List<Document> documents = this.vectorStore.similaritySearch(SearchRequest.builder()

@@ -10,48 +10,50 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+/**
+ * Central configuration for the Spring AI clients and chat memory used by the
+ * app.
+ *
+ * <p>This class defines the default chat client, the persisted chat memory, and
+ * the memory-aware chat client used by the RAG demo.</p>
+ */
 @Configuration
 public class AIConfig {
 	
 	@Value("${chat.memory.messages.window.size:10}")
 	private Integer messageWindowSize;
 
-	// This method defines a Spring Bean for the ChatClient,
-	// which is used to interact with the AI.
-	// The ChatClient is configured with a default system prompt that sets the
-	// context for the AI,
-	// instructing it to act as a helpful Java Assistant.
-	// This means that any interactions with the AI will be framed within this
-	// context,
-	// guiding the AI's responses to be relevant to Java programming assistance.
+	/**
+	 * Creates the primary chat client used by most of the demo endpoints.
+	 *
+	 * <p>The default system prompt keeps the assistant grounded as a general
+	 * Java-focused helper unless a controller supplies a more specific system
+	 * prompt.</p>
+	 */
 	@Bean
 	@Primary
-	public ChatClient chatClient(ChatClient.Builder builder) {// The ChatClient.Builder is injected into the method,
-																// allowing us to configure the ChatClient before it is
-																// built.
-		return builder.defaultSystem("You are a helpful Java Assistant").build();// The builder is used to set a default
-																					// system prompt for the ChatClient,
-																					// and then the build() method is
-																					// called to create the ChatClient
-																					// instance that will be managed by
-																					// Spring.
+	public ChatClient chatClient(ChatClient.Builder builder) {
+		return builder.defaultSystem("You are a helpful Java Assistant").build();
 	}
 
-	// This ChatMemory bean is used by the persisted chat demo.
-	// It uses the JdbcChatMemoryRepository to store messages in Postgres, so the
-	// memory persists across application restarts.
+	/**
+	 * Builds a bounded chat-memory window backed by the configured repository.
+	 *
+	 * <p>The repository persists chat history in PostgreSQL, while
+	 * {@link MessageWindowChatMemory} keeps only the last few turns in the active
+	 * prompt context.</p>
+	 */
 	@Bean
 	public ChatMemory persistedChatMemory(ChatMemoryRepository chatMemoryRepository) {
-		// This keeps the Spring AI memory demo intact, but swaps the backing store from
-		// a volatile in-memory map to the JDBC repository so we can verify persistence.
 		return MessageWindowChatMemory.builder().maxMessages(messageWindowSize).chatMemoryRepository(chatMemoryRepository).build();
 	}
 
-	// This ChatClient bean is configured with a MessageChatMemoryAdvisor that uses
-	// the persisted ChatMemory.
-	// This allows the persisted chat demo to automatically have memory capabilities
-	// with durable storage, without needing to manage the memory manually in the
-	// controller.
+	/**
+	 * Creates the chat client used by the persisted-memory demo.
+	 *
+	 * <p>The {@link MessageChatMemoryAdvisor} injects the persisted memory into
+	 * each request so the assistant can continue the conversation by session ID.</p>
+	 */
 	@Bean("persistedChatClient")
 	public ChatClient persistedChatClient(ChatClient.Builder builder, ChatMemory persistedChatMemory) {
 		return builder.defaultAdvisors(MessageChatMemoryAdvisor.builder(persistedChatMemory).build()).build();

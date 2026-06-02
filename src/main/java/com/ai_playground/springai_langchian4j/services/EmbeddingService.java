@@ -25,6 +25,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pgvector.PGvector;
 
+/**
+ * Handles ingestion into the vector store and the lower-level manual pgvector
+ * JDBC path used for experimentation.
+ *
+ * <p>Most of the app uses the higher-level {@link VectorStore} abstraction.
+ * The explicit JDBC path is kept here as a reference for how the same data maps
+ * to the underlying pgvector table.</p>
+ */
 @Service
 public class EmbeddingService {
 
@@ -53,22 +61,38 @@ public class EmbeddingService {
 		this.objectMapper = objectMapper;
 	}
 
-	// This method both embeds the documents and saves them to the vector store, which in this case is backed by PostgreSQL with pgvector.
+	/**
+	 * Stores fully prepared documents through Spring AI's vector-store abstraction.
+	 *
+	 * <p>The store handles embedding plus persistence, which keeps the ingestion
+	 * path small and consistent.</p>
+	 */
 	public void embedDocuments(List<Document> documents) {
 		this.vectorStore.add(documents);
 	}
 	
+	/**
+	 * Reads, chunks, and stores a single classpath document using custom splitter
+	 * settings.
+	 */
 	public void embedResource(String filename, int chunkSize, int minChunkSizeChars, int minChunkLengthToEmbed,
 			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks, Map<String, Object> metadata) {
 		Resource resource = new ClassPathResource("docs/" + filename);
 		this.vectorStore.add(etlService.process(resource, chunkSize, minChunkSizeChars, minChunkLengthToEmbed, maxNumChunks, keepSeparator, punctuationMarks, metadata));
 	}
 	
+	/**
+	 * Reads, chunks, and stores a single classpath document using the default
+	 * splitter settings.
+	 */
 	public void embedResource(String filename, Map<String, Object> metadata) {
 		Resource resource = new ClassPathResource("docs/" + filename);
 		this.vectorStore.add(etlService.process(resource, metadata));
 	}
 	
+	/**
+	 * Scans a classpath pattern and stores every readable document it finds.
+	 */
 	public void embedDirectory(String pathPattern, Map<String, Object> metadata) {
 		try {
 			Resource[] resources = this.resourcePatternResolver.getResources(pathPattern);
@@ -83,6 +107,10 @@ public class EmbeddingService {
 		}
 	}
 	
+	/**
+	 * Same as {@link #embedDirectory(String, Map)} but with custom chunking
+	 * settings.
+	 */
 	public void embedDirectory(String pathPattern, int chunkSize, int minChunkSizeChars, int minChunkLengthToEmbed,
 			int maxNumChunks, boolean keepSeparator, List<Character> punctuationMarks, Map<String, Object> metadata) {
 		try {
@@ -98,13 +126,24 @@ public class EmbeddingService {
 		}
 	}
 	
-	// This method both embeds the documents and saves them to the vector store, which in this case is backed by PostgreSQL with pgvector.
+	/**
+	 * Alias for the standard vector-store ingestion path.
+	 *
+	 * <p>Kept for readability in places where the caller wants the method name to
+	 * say "embed and save" explicitly.</p>
+	 */
 	public void embedAndSaveDocuments(List<Document> documents) {
 		this.vectorStore.add(documents);
 	}
 
-	// This method demonstrates how to embed documents and save them to PostgreSQL with pgvector directly using JdbcTemplate, 
-	// without going through the VectorStore abstraction.
+	/**
+	 * Demonstrates the manual path: embed in-memory, then insert directly into the
+	 * pgvector table with JDBC.
+	 *
+	 * <p>This is intentionally more explicit than {@link #embedDocuments(List)} so
+	 * you can see how the content, metadata, and vector map to the database
+	 * schema.</p>
+	 */
 	public void embedDocumentsLongApproach(List<Document> documents) {
 		List<String> texts = documents.stream()
 			.map(Document::getText)
@@ -133,10 +172,17 @@ public class EmbeddingService {
 		}
 	}
 
+	/**
+	 * Builds the fully qualified pgvector table name from configuration.
+	 */
 	private String qualifiedTableName() {
 		return this.schemaName + "." + this.tableName;
 	}
 
+	/**
+	 * Serializes document metadata to JSON so it can be stored in the jsonb
+	 * column.
+	 */
 	private String toJson(Object value) {
 		try {
 			return this.objectMapper.writeValueAsString(value);
