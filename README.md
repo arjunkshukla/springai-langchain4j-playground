@@ -1,153 +1,238 @@
 # springai-langchain4j-playground
 
-This repository is a Spring Boot playground for comparing Spring AI and LangChain4j on the same basic OpenAI-backed setup.
+This repository is a small Spring Boot playground for experimenting with Spring AI chat and tool calling.
 
-The current branch, `base-example-with-openai-sdk`, is intentionally simple:
-
-- one Spring AI `ChatClient` configured with the OpenAI SDK
-- one LangChain4j `ChatModel` configured with OpenAI
-- one LangChain4j AI service interface built on top of that model
-- a small set of controller endpoints that show the two libraries side by side
-
-The goal is to make the wiring easy to inspect and the differences easy to see.
+The current code path is focused on Spring AI `ChatClient` with an OpenAI-backed chat model. Earlier Ollama experiments are useful because they show an important difference between "model supports tool calls" and "model reliably uses tool results."
 
 ## What this branch demonstrates
 
-- how to create a Spring AI `ChatClient` with a default system prompt
-- how to use Spring AI for plain question/answer and joke generation
-- how to create a LangChain4j `ChatModel` from OpenAI settings
-- how to use LangChain4j directly with `chat(...)`
-- how to use LangChain4j AI services with `@SystemMessage` and `@UserMessage`
-- how to keep the same app talking to the same underlying OpenAI model through two different APIs
+- a primary Spring AI `ChatClient` for normal chat requests
+- a second Spring AI `ChatClient` configured with local Java tools
+- plain HTTP endpoints for chat, joke generation, and tool-backed questions
+- the practical difference between Ollama local tool calling and OpenAI tool calling
 
 ## Runtime model setup
 
-The app uses OpenAI as the main model provider.
+The app currently uses OpenAI as the chat provider.
 
 Configuration lives in `src/main/resources/application.properties`:
 
-- `spring.ai.model.chat=openai`
-- `spring.ai.openai.api-key=${OPENAI_API_KEY:}`
-- `spring.ai.openai.chat.options.model=${OPENAI_CHAT_MODEL:gpt-4o-mini}`
-- `app.langchain4j.openai.api-key=${OPENAI_API_KEY:}`
-- `app.langchain4j.openai.model-name=${OPENAI_CHAT_MODEL:gpt-4o-mini}`
+```properties
+spring.application.name=springai-langchain4j
 
-Recommended environment variables:
+spring.ai.model.chat=openai
+spring.ai.openai.api-key=${OPENAI_API_KEY:}
+spring.ai.openai.chat.options.model=${OPENAI_CHAT_MODEL:gpt-4o-mini}
+
+app.langchain4j.openai.api-key=${OPENAI_API_KEY:}
+app.langchain4j.openai.model-name=${OPENAI_CHAT_MODEL:gpt-4o-mini}
+```
+
+Required environment variable:
 
 - `OPENAI_API_KEY`
+
+Optional environment variable:
+
 - `OPENAI_CHAT_MODEL`
 
 If `OPENAI_CHAT_MODEL` is not set, the app defaults to `gpt-4o-mini`.
 
 ## Project structure
 
-### Application bootstrap
-
-[`SpringAILangChain4jApplication`](src/main/java/com/ai_playground/springai_langchian4j/SpringAILangChain4jApplication.java)
-
-Standard Spring Boot entry point.
-
-### Spring AI wiring
-
-[`AIConfig`](src/main/java/com/ai_playground/springai_langchian4j/AIConfig.java)
-
-This configuration class creates:
-
-- a Spring AI `ChatClient` bean with a default system prompt:
-  - `"You are a helpful Java Assistant"`
-- a LangChain4j `ChatModel` bean named `langchain4jChatModel`
-- a LangChain4j AI service bean named `langchain4jAssistant`
-
-The Spring AI `ChatClient` is the main Spring-side integration.
-
-The LangChain4j beans are built from the same OpenAI configuration values, so both libraries can be compared using the same model family.
-
-### Spring AI controller
-
-[`GenerativeController`](src/main/java/com/ai_playground/springai_langchian4j/controllers/GenerativeController.java)
-
-This controller exposes two simple Spring AI endpoints:
-
-- `GET /ask`
-- `GET /joke`
-
-`/ask` sends a free-form question to the primary `ChatClient`.
-
-`/joke` adds a comedian-style system prompt and asks for a joke about a topic.
-
-### LangChain4j controller
-
-[`LangChain4jController`](src/main/java/com/ai_playground/springai_langchian4j/controllers/LangChain4jController.java)
-
-This controller shows the LangChain4j side of the same idea:
-
-- `GET /lc4j/ask`
-- `GET /lc4j/joke`
-- `GET /lc4j/service/joke`
-
-`/lc4j/ask` uses the raw LangChain4j `ChatModel`.
-
-`/lc4j/joke` uses the raw `ChatModel` with an explicit system message and user message list.
-
-`/lc4j/service/joke` uses the LangChain4j AI service interface and is the cleanest example of the LangChain4j service abstraction in this branch.
-
-### LangChain4j assistant interface
-
-[`LangChain4jAssistant`](src/main/java/com/ai_playground/springai_langchian4j/LangChain4jAssistant.java)
-
-This interface defines the LangChain4j AI service method:
-
-- `tellJoke(String topic)`
-
-It is annotated with:
-
-- `@SystemMessage("You are a comedian. Be sarcastic and funny.")`
-- `@UserMessage("Tell me a joke about {{topic}}")`
-
-That gives you the same joke behavior as the controller, but through LangChain4j's service abstraction.
-
-## Endpoint guide
-
-### Spring AI examples
-
 ```text
-GET /ask?question=What%20is%20Spring%20AI?
-GET /joke?topic=Donald%20Trump
+src/main/java/com/ai_playground/springai_langchian4j/
+  SpringAILangChain4jApplication.java
+  AIConfig.java
+  controllers/
+    GenerativeController.java
+    ToolsController.java
+  tools/
+    WeatherTools.java
+
+src/main/resources/
+  application.properties
+  coredeux-entities.yml
+
+compose.yaml
+pom.xml
 ```
 
-### LangChain4j examples
+## Application wiring
 
-```text
-GET /lc4j/ask?question=What%20is%20LangChain4j?
-GET /lc4j/joke?topic=Donald%20Trump
-GET /lc4j/service/joke?topic=Donald%20Trump
+### `AIConfig`
+
+`AIConfig` defines two Spring AI clients:
+
+- `chatClient`
+- `toolChatClient`
+
+`chatClient` is the primary bean and is used by the regular `/ask` and `/joke` endpoints.
+
+`toolChatClient` registers `WeatherTools` via:
+
+```java
+.defaultTools(weatherTools)
 ```
 
-## Dependencies
+It also uses a stricter system prompt so that tool results are treated as authoritative when the model produces a final answer.
 
-The POM includes:
+### `GenerativeController`
 
-- Spring Boot Web
-- Spring AI OpenAI SDK
-- LangChain4j Spring Boot starter
-- LangChain4j OpenAI support
-- Spring Boot test support
-- Coredeux starter dependencies used by the project setup
+`GenerativeController` exposes the regular chat endpoints:
 
-## How the two stacks differ in this branch
+```text
+GET /ask?question=...
+GET /joke?topic=...
+```
 
-This branch is useful because it keeps the same kind of requests on both sides:
+`/ask` sends the user question to the primary Spring AI `ChatClient`.
 
-- Spring AI:
-  - `ChatClient`
-  - fluent prompt building
-  - `.call()` for synchronous response retrieval
-- LangChain4j:
-  - direct `ChatModel.chat(...)`
-  - message lists for system/user roles
-  - AI service interface via `AiServices.create(...)`
+`/joke` adds a comedian-style system prompt and asks for a joke about the supplied topic.
 
-You can use the same topic or question and compare how the two libraries feel from the controller layer.
+### `ToolsController`
+
+`ToolsController` exposes:
+
+```text
+GET /tools/ask?question=...
+```
+
+This endpoint uses the `toolChatClient`, so the model can request Java tool execution before producing the final response.
+
+Example:
+
+```text
+GET /tools/ask?question=how%20is%20sydney's%20weather%20today%3F%20and%20tell%20me%20what%20is%202%20%2B%202%3F
+```
+
+Expected behavior with `gpt-4o-mini`:
+
+```text
+The current weather in Sydney is purple snow with 123C.
+
+As for the mathematical operation, 2 + 2 equals 4.
+```
+
+### `WeatherTools`
+
+`WeatherTools` is a local Java tool component.
+
+It currently contains two tool methods:
+
+- `getWeather(String location)`
+- `getExchangeRate(String fromCurrency, String toCurrency)`
+
+These methods do not call live external APIs. They return hardcoded sample values so tool behavior is easy to test.
+
+The Sydney weather response is intentionally unrealistic in the current experiment:
+
+```text
+The current weather in Sydney is purple snow with 123C.
+```
+
+That sentinel value makes it obvious whether the model preserved the Java tool result or invented its own answer.
+
+## Tool-calling observations
+
+### Finding: Ollama `llama3` does not support tools
+
+Using Ollama with `llama3` failed immediately for tool-backed requests.
+
+Observed error:
+
+```text
+HTTP 400 - {"error":"registry.ollama.ai/library/llama3:latest does not support tools"}
+```
+
+Resolution for that specific error:
+
+```properties
+spring.ai.ollama.chat.options.model=llama3.1
+```
+
+`llama3.1` supports tool calling, while `llama3` does not.
+
+### Finding: `llama3.1` can call tools, but final answers were unreliable
+
+After switching from `llama3` to `llama3.1`, the model could invoke the Java tool. Debugging confirmed that Spring AI called:
+
+```text
+getWeather("Sydney")
+```
+
+However, the final model response was inconsistent. Observed behavior included:
+
+- replacing the tool result with plausible live-weather text
+- formatting invented OpenWeather-style JSON
+- saying the tool result was used instead of answering the user
+- hallucinating extra tools such as a weather API tool or calculator tool
+- failing compound prompts like weather plus `2 + 2`
+
+The important lesson: tool support only means the model can request tool execution. It does not guarantee that the model will faithfully preserve the tool result in its final answer.
+
+### Finding: `returnDirect = true` is exact but too limited for compound prompts
+
+Spring AI tools can use `returnDirect = true`.
+
+That makes Spring AI return the Java tool result directly after the tool executes.
+
+This fixed simple prompts like:
+
+```text
+how is sydney's weather today?
+```
+
+But it broke compound prompts like:
+
+```text
+how is sydney's weather today? and tell me what is 2 + 2?
+```
+
+Because the response stops at the weather tool result, the model does not continue and answer the math question.
+
+Conclusion: `returnDirect = true` is useful when the endpoint should return only the tool result. It is not a good fit for general multi-part assistant prompts.
+
+### Resolution: switch the tool client to OpenAI
+
+Switching the chat provider to OpenAI with `gpt-4o-mini` resolved the observed compound prompt issue.
+
+With the current OpenAI configuration, the model:
+
+- calls the Spring AI tool
+- preserves the sentinel weather result
+- continues answering the rest of the prompt
+
+Example result:
+
+```text
+The current weather in Sydney is purple snow with a temperature of 123C.
+
+As for the mathematical operation, 2 + 2 equals 4.
+```
+
+This is the behavior expected from a tool-using assistant: use tools for tool-backed facts, then continue reasoning over the full user request.
+
+## Notes on Ollama
+
+The repo still includes `compose.yaml` for running Ollama locally, and the POM still includes the Ollama starter. That makes it easy to continue local-model experiments.
+
+If you switch back to Ollama for tool testing:
+
+```powershell
+docker compose -f compose.yaml up -d
+docker exec -it codebase-ollama-1 ollama pull llama3.1
+```
+
+Then configure:
+
+```properties
+spring.ai.model.chat=ollama
+spring.ai.ollama.base-url=http://localhost:11434
+spring.ai.ollama.chat.options.model=llama3.1
+```
+
+Use that path for experimentation, but expect weaker tool-result fidelity than OpenAI for compound prompts.
 
 ## Running locally
 
@@ -155,13 +240,25 @@ You can use the same topic or question and compare how the two libraries feel fr
 
 Make sure `OPENAI_API_KEY` is available to the process that runs the app.
 
+PowerShell example:
+
+```powershell
+$env:OPENAI_API_KEY="..."
+```
+
+Optional model override:
+
+```powershell
+$env:OPENAI_CHAT_MODEL="gpt-4o-mini"
+```
+
 ### 2. Run the application
 
 ```powershell
 ./mvnw spring-boot:run
 ```
 
-or
+or:
 
 ```powershell
 mvn spring-boot:run
@@ -169,23 +266,51 @@ mvn spring-boot:run
 
 ### 3. Call the endpoints
 
-Use the sample URLs above and compare the responses from Spring AI and LangChain4j.
+Regular chat:
 
-## Notes for readers
+```text
+GET /ask?question=What%20is%20Spring%20AI?
+```
 
-- This branch is deliberately small and focused.
-- The interesting part is not the prompt itself, but the way the same prompt is wired through different abstractions.
-- The Spring AI and LangChain4j pieces are both using OpenAI in this branch, so differences in behavior are easier to attribute to the library layer rather than the provider.
+Joke generation:
 
-## Previous experiments
+```text
+GET /joke?topic=Spring%20Boot
+```
 
-Earlier branches in this repo explored prompt templates, streaming, Ollama, structured output, and other response-mapping experiments. Those are not the focus of the current branch.
+Tool-backed chat:
 
-If you are reading this branch from scratch, start with:
+```text
+GET /tools/ask?question=how%20is%20sydney's%20weather%20today%3F
+```
 
-1. `AIConfig`
-2. `GenerativeController`
-3. `LangChain4jController`
-4. `LangChain4jAssistant`
+Compound tool-backed prompt:
 
-That gives you the whole story of the branch in a few files.
+```text
+GET /tools/ask?question=how%20is%20sydney's%20weather%20today%3F%20and%20tell%20me%20what%20is%202%20%2B%202%3F
+```
+
+## Dependencies
+
+The POM includes:
+
+- Spring Boot Web
+- Spring AI OpenAI starter
+- Spring AI Ollama starter
+- LangChain4j Spring Boot starter
+- Spring Boot test support
+- Coredeux starter dependencies used by the project setup
+
+The active application code in this branch is currently Spring AI focused. LangChain4j dependencies remain in the build, but there is no active LangChain4j controller in `src/main/java`.
+
+## Summary
+
+This experiment showed that the Spring AI wiring was not the problem.
+
+The model/provider choice mattered:
+
+- Ollama `llama3`: failed because tools are not supported.
+- Ollama `llama3.1`: called tools, but final answers were unreliable for compound prompts.
+- OpenAI `gpt-4o-mini`: preserved tool output and answered the full compound request.
+
+For this branch, OpenAI is the recommended provider for tool-calling demos.

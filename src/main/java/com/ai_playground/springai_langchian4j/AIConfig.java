@@ -1,13 +1,11 @@
 package com.ai_playground.springai_langchian4j;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
-import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.service.AiServices;
+import com.ai_playground.springai_langchian4j.tools.DemoTools;
 
 @Configuration
 public class AIConfig {
@@ -21,6 +19,7 @@ public class AIConfig {
 	// context,
 	// guiding the AI's responses to be relevant to Java programming assistance.
 	@Bean
+	@Primary
 	public ChatClient chatClient(ChatClient.Builder builder) {// The ChatClient.Builder is injected into the method,
 																// allowing us to configure the ChatClient before it is
 																// built.
@@ -32,18 +31,15 @@ public class AIConfig {
 																					// Spring.
 	}
 
-	@Bean(name = "langchain4jChatModel")
-	public ChatModel langchain4jChatModel(
-			@Value("${app.langchain4j.openai.api-key}") String apiKey,
-			@Value("${app.langchain4j.openai.model-name}") String modelName) {
-		return OpenAiChatModel.builder()
-				.apiKey(apiKey)
-				.modelName(modelName)
-				.build();
-	}
-
 	@Bean
-	public LangChain4jAssistant langchain4jAssistant(ChatModel langchain4jChatModel) {
-		return AiServices.create(LangChain4jAssistant.class, langchain4jChatModel);
+	public ChatClient toolChatClient(ChatClient.Builder builder, DemoTools demoTools) {
+		return builder.defaultSystem("""
+				You are a helpful assistant.
+				When a tool is used, treat the tool result as the authoritative source for that topic.
+				Preserve all factual values from tool results exactly.
+				Do not replace tool facts with your own knowledge or inferred live data.
+				If the user asks multiple questions, answer every part of the request.
+				Do not mention that a tool was called unless the user asks.
+				""").defaultTools(demoTools).build();
 	}
 }
