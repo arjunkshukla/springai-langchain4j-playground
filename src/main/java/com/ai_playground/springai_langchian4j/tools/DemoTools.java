@@ -3,9 +3,15 @@ package com.ai_playground.springai_langchian4j.tools;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
+/**
+ * Local demo tool implementation used by Spring AI static and dynamic tool examples.
+ */
 @Component
 public class DemoTools {
 
+	/**
+	 * Returns a hardcoded weather response for a requested city.
+	 */
 	@Tool(description = "Get the current weather for a specific city or location.")
 	public String getWeather(String location) {
 		if (location == null || location.isEmpty()) {
@@ -21,6 +27,9 @@ public class DemoTools {
 		}
 	}
 	
+	/**
+	 * Returns a hardcoded exchange-rate response for two currency codes.
+	 */
 	@Tool(description = "Get the current exchange rate between two currencies.")
 	public String getExchangeRate(String fromCurrency, String toCurrency) {
 		if (fromCurrency == null || toCurrency == null || fromCurrency.isEmpty() || toCurrency.isEmpty()) {
@@ -38,6 +47,9 @@ public class DemoTools {
 		}
 	}
 	
+	/**
+	 * Simulates adding a product and quantity to a shopping cart.
+	 */
 	@Tool(description = "Add an item to the shopping cart.")
 	public String addToCart(String cartId, String productCode, int quantity) {
 		if (cartId == null || productCode == null || cartId.isEmpty() || productCode.isEmpty() || quantity <= 0) {
@@ -48,6 +60,9 @@ public class DemoTools {
 		}
 	}
 	
+	/**
+	 * Simulates booking a flight between two locations on a requested date.
+	 */
 	@Tool(description = "Book a flight for a specific route and date.")
 	public String bookFight(String from, String to, String date) {
 		if (from == null || to == null || date == null || from.isEmpty() || to.isEmpty() || date.isEmpty()) {

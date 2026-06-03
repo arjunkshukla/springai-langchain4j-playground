@@ -8,6 +8,7 @@ The current code path is focused on Spring AI `ChatClient` with an OpenAI-backed
 
 - a primary Spring AI `ChatClient` for normal chat requests
 - a second Spring AI `ChatClient` configured with local Java tools
+- a request-time dynamic tool callback endpoint using `FunctionToolCallback`
 - plain HTTP endpoints for chat, joke generation, and tool-backed questions
 - the practical difference between Ollama local tool calling and OpenAI tool calling
 
@@ -47,8 +48,9 @@ src/main/java/com/ai_playground/springai_langchian4j/
   controllers/
     GenerativeController.java
     ToolsController.java
+    FunctionCallbackController.java
   tools/
-    WeatherTools.java
+    DemoTools.java
 
 src/main/resources/
   application.properties
@@ -69,10 +71,10 @@ pom.xml
 
 `chatClient` is the primary bean and is used by the regular `/ask` and `/joke` endpoints.
 
-`toolChatClient` registers `WeatherTools` via:
+`toolChatClient` registers `DemoTools` via:
 
 ```java
-.defaultTools(weatherTools)
+.defaultTools(demoTools)
 ```
 
 It also uses a stricter system prompt so that tool results are treated as authoritative when the model produces a final answer.
@@ -114,14 +116,46 @@ The current weather in Sydney is purple snow with 123C.
 As for the mathematical operation, 2 + 2 equals 4.
 ```
 
-### `WeatherTools`
+### `FunctionCallbackController`
 
-`WeatherTools` is a local Java tool component.
+`FunctionCallbackController` exposes:
 
-It currently contains two tool methods:
+```text
+GET /function-callback/ask?question=...
+```
+
+This endpoint demonstrates dynamic tools. Instead of registering a static tool bean on the `ChatClient`, it builds a request-specific list of `FunctionToolCallback` instances and passes them into:
+
+```java
+.toolCallbacks(toolCallbacks)
+```
+
+The controller currently exposes only the callbacks relevant to the incoming question:
+
+- weather questions get a weather callback
+- exchange/currency questions get an exchange-rate callback
+- cart questions get an add-to-cart callback
+- flight questions get a book-flight callback
+- arithmetic expressions get a calculator callback
+
+Example:
+
+```text
+GET /function-callback/ask?question=how%20is%20sydney's%20weather%20today%3F%20and%20tell%20me%20what%20is%202%20%2B%202%3F
+```
+
+That request exposes the weather and calculator callbacks for that call only.
+
+### `DemoTools`
+
+`DemoTools` is a local Java tool component.
+
+It currently contains these annotated tool methods:
 
 - `getWeather(String location)`
 - `getExchangeRate(String fromCurrency, String toCurrency)`
+- `addToCart(String cartId, String productCode, int quantity)`
+- `bookFight(String from, String to, String date)`
 
 These methods do not call live external APIs. They return hardcoded sample values so tool behavior is easy to test.
 
@@ -288,6 +322,12 @@ Compound tool-backed prompt:
 
 ```text
 GET /tools/ask?question=how%20is%20sydney's%20weather%20today%3F%20and%20tell%20me%20what%20is%202%20%2B%202%3F
+```
+
+Dynamic tool callback example:
+
+```text
+GET /function-callback/ask?question=how%20is%20sydney's%20weather%20today%3F%20and%20tell%20me%20what%20is%202%20%2B%202%3F
 ```
 
 ## Dependencies
