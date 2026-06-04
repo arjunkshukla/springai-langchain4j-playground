@@ -43,13 +43,13 @@ If `OPENAI_CHAT_MODEL` is not set, the app defaults to `gpt-4o-mini`.
 
 ### Application bootstrap
 
-[`SpringAILangChain4jApplication`](src/main/java/com/ai_playground/springai_langchian4j/SpringAILangChain4jApplication.java)
+[`SpringAILangChain4jApplication`](src/main/java/com/ai_playground/springai_langchain4j/SpringAILangChain4jApplication.java)
 
 Standard Spring Boot entry point.
 
 ### Spring AI wiring
 
-[`AIConfig`](src/main/java/com/ai_playground/springai_langchian4j/AIConfig.java)
+[`AIConfig`](src/main/java/com/ai_playground/springai_langchain4j/AIConfig.java)
 
 This configuration class creates:
 
@@ -64,7 +64,7 @@ The LangChain4j beans are built from the same OpenAI configuration values, so bo
 
 ### Spring AI controller
 
-[`GenerativeController`](src/main/java/com/ai_playground/springai_langchian4j/controllers/GenerativeController.java)
+[`GenerativeController`](src/main/java/com/ai_playground/springai_langchain4j/controllers/GenerativeController.java)
 
 This controller exposes two simple Spring AI endpoints:
 
@@ -77,7 +77,7 @@ This controller exposes two simple Spring AI endpoints:
 
 ### LangChain4j controller
 
-[`LangChain4jController`](src/main/java/com/ai_playground/springai_langchian4j/controllers/LangChain4jController.java)
+[`LangChain4jController`](src/main/java/com/ai_playground/springai_langchain4j/controllers/LangChain4jController.java)
 
 This controller shows the LangChain4j side of the same idea:
 
@@ -93,7 +93,7 @@ This controller shows the LangChain4j side of the same idea:
 
 ### LangChain4j assistant interface
 
-[`LangChain4jAssistant`](src/main/java/com/ai_playground/springai_langchian4j/LangChain4jAssistant.java)
+[`LangChain4jAssistant`](src/main/java/com/ai_playground/springai_langchain4j/LangChain4jAssistant.java)
 
 This interface defines the LangChain4j AI service method:
 

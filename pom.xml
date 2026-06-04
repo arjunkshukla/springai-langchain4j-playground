@@ -9,7 +9,7 @@
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ai-playground</groupId>
-    <artifactId>springai-langchian4j</artifactId>
+    <artifactId>springai-langchain4j</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>springai-langchain4j-playground</name>
     <description>Proof-of-concept Spring Boot project integrating Spring AI and langchain4j with OpenAI.</description>
