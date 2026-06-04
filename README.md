@@ -36,7 +36,7 @@ The branch also keeps the LangChain4j Ollama settings in `application.properties
 
 ### Configuration
 
-[`MultiModelConfig`](src/main/java/com/ai_playground/springai_langchian4j/MultiModelConfig.java)
+[`MultiModelConfig`](src/main/java/com/ai_playground/springai_langchain4j/MultiModelConfig.java)
 
 This configuration class defines:
 
@@ -49,7 +49,7 @@ That means the app can speak to both providers without changing the controller l
 
 ### Controllers
 
-[`GenerativeController`](src/main/java/com/ai_playground/springai_langchian4j/controllers/GenerativeController.java)
+[`GenerativeController`](src/main/java/com/ai_playground/springai_langchain4j/controllers/GenerativeController.java)
 
 This is the main controller in the current branch. It exposes two endpoints:
 
