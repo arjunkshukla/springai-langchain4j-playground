@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j;
+package com.ai_playground.springai_langchain4j;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -6,15 +6,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-import com.ai_playground.springai_langchian4j.lc4j.ChatMessageEntityRepository;
-import com.ai_playground.springai_langchian4j.lc4j.InMemoryAssistant;
-import com.ai_playground.springai_langchian4j.lc4j.LocalTokenCountEstimator;
-import com.ai_playground.springai_langchian4j.lc4j.MessageSummaryChatMemory;
-import com.ai_playground.springai_langchian4j.lc4j.PersistentChatMemoryStore;
-import com.ai_playground.springai_langchian4j.lc4j.RedisStoreChatAssistantWithSlidingWindowStrategy;
-import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithMessageSummarizationStrategy;
-import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithSlidingWindowStrategy;
-import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithTokenWindowStrategy;
+import com.ai_playground.springai_langchain4j.lc4j.ChatMessageEntityRepository;
+import com.ai_playground.springai_langchain4j.lc4j.InMemoryAssistant;
+import com.ai_playground.springai_langchain4j.lc4j.LocalTokenCountEstimator;
+import com.ai_playground.springai_langchain4j.lc4j.MessageSummaryChatMemory;
+import com.ai_playground.springai_langchain4j.lc4j.PersistentChatMemoryStore;
+import com.ai_playground.springai_langchain4j.lc4j.RedisStoreChatAssistantWithSlidingWindowStrategy;
+import com.ai_playground.springai_langchain4j.lc4j.SQLPersistedChatAssistantWithMessageSummarizationStrategy;
+import com.ai_playground.springai_langchain4j.lc4j.SQLPersistedChatAssistantWithSlidingWindowStrategy;
+import com.ai_playground.springai_langchain4j.lc4j.SQLPersistedChatAssistantWithTokenWindowStrategy;
 
 import dev.langchain4j.community.store.memory.chat.redis.RedisChatMemoryStore;
 import dev.langchain4j.community.store.memory.chat.redis.StoreType;

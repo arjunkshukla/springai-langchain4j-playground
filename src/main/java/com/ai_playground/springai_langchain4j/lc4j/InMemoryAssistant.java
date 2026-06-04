@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.lc4j;
+package com.ai_playground.springai_langchain4j.lc4j;
 
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;

@@ -62,7 +62,7 @@ The branch has one shared application runtime, but several different chat modes.
 The important files live under these paths:
 
 ```text
-src/main/java/com/ai_playground/springai_langchian4j/
+src/main/java/com/ai_playground/springai_langchain4j/
   SpringAILangChain4jApplication.java
   SpringAIConfig.java
   LangChain4jConfig.java
@@ -619,7 +619,7 @@ The memory routes all rely on the `sessionId` you pass in. That value becomes th
 
 The repository includes an exported Postman collection at:
 
-- [`postman_collections/springai-langchian4j.postman_collection.json`](postman_collections/springai-langchian4j.postman_collection.json)
+- [`postman_collections/springai-langchain4j.postman_collection.json`](postman_collections/springai-langchain4j.postman_collection.json)
 
 The collection is meant to give you a ready-made walkthrough of the POC without having to handcraft each request.
 
@@ -739,11 +739,11 @@ That sequence gives you a good mental model of the app from the edge inward.
 - [`pom.xml`](pom.xml)
 - [`compose.yaml`](compose.yaml)
 - [`src/main/resources/application.properties`](src/main/resources/application.properties)
-- [`src/main/java/com/ai_playground/springai_langchian4j/SpringAIConfig.java`](src/main/java/com/ai_playground/springai_langchian4j/SpringAIConfig.java)
-- [`src/main/java/com/ai_playground/springai_langchian4j/LangChain4jConfig.java`](src/main/java/com/ai_playground/springai_langchian4j/LangChain4jConfig.java)
-- [`src/main/java/com/ai_playground/springai_langchian4j/controllers/GenerativeController.java`](src/main/java/com/ai_playground/springai_langchian4j/controllers/GenerativeController.java)
-- [`src/main/java/com/ai_playground/springai_langchian4j/controllers/ManualMemoryManagementController.java`](src/main/java/com/ai_playground/springai_langchian4j/controllers/ManualMemoryManagementController.java)
-- [`src/main/java/com/ai_playground/springai_langchian4j/controllers/ChatMemorySpringAIController.java`](src/main/java/com/ai_playground/springai_langchian4j/controllers/ChatMemorySpringAIController.java)
-- [`src/main/java/com/ai_playground/springai_langchian4j/controllers/ChatMemoryLangchain4jController.java`](src/main/java/com/ai_playground/springai_langchian4j/controllers/ChatMemoryLangchain4jController.java)
-- [`src/main/java/com/ai_playground/springai_langchian4j/lc4j/PersistentChatMemoryStore.java`](src/main/java/com/ai_playground/springai_langchian4j/lc4j/PersistentChatMemoryStore.java)
-- [`src/main/java/com/ai_playground/springai_langchian4j/lc4j/MessageSummaryChatMemory.java`](src/main/java/com/ai_playground/springai_langchian4j/lc4j/MessageSummaryChatMemory.java)
+- [`src/main/java/com/ai_playground/springai_langchain4j/SpringAIConfig.java`](src/main/java/com/ai_playground/springai_langchain4j/SpringAIConfig.java)
+- [`src/main/java/com/ai_playground/springai_langchain4j/LangChain4jConfig.java`](src/main/java/com/ai_playground/springai_langchain4j/LangChain4jConfig.java)
+- [`src/main/java/com/ai_playground/springai_langchain4j/controllers/GenerativeController.java`](src/main/java/com/ai_playground/springai_langchain4j/controllers/GenerativeController.java)
+- [`src/main/java/com/ai_playground/springai_langchain4j/controllers/ManualMemoryManagementController.java`](src/main/java/com/ai_playground/springai_langchain4j/controllers/ManualMemoryManagementController.java)
+- [`src/main/java/com/ai_playground/springai_langchain4j/controllers/ChatMemorySpringAIController.java`](src/main/java/com/ai_playground/springai_langchain4j/controllers/ChatMemorySpringAIController.java)
+- [`src/main/java/com/ai_playground/springai_langchain4j/controllers/ChatMemoryLangchain4jController.java`](src/main/java/com/ai_playground/springai_langchain4j/controllers/ChatMemoryLangchain4jController.java)
+- [`src/main/java/com/ai_playground/springai_langchain4j/lc4j/PersistentChatMemoryStore.java`](src/main/java/com/ai_playground/springai_langchain4j/lc4j/PersistentChatMemoryStore.java)
+- [`src/main/java/com/ai_playground/springai_langchain4j/lc4j/MessageSummaryChatMemory.java`](src/main/java/com/ai_playground/springai_langchain4j/lc4j/MessageSummaryChatMemory.java)

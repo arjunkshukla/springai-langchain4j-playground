@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j;
+package com.ai_playground.springai_langchain4j;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;

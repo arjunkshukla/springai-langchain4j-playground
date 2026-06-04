@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.controllers;
+package com.ai_playground.springai_langchain4j.controllers;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ai_playground.springai_langchian4j.lc4j.InMemoryAssistant;
-import com.ai_playground.springai_langchian4j.lc4j.RedisStoreChatAssistantWithSlidingWindowStrategy;
-import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithMessageSummarizationStrategy;
-import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithSlidingWindowStrategy;
-import com.ai_playground.springai_langchian4j.lc4j.SQLPersistedChatAssistantWithTokenWindowStrategy;
+import com.ai_playground.springai_langchain4j.lc4j.InMemoryAssistant;
+import com.ai_playground.springai_langchain4j.lc4j.RedisStoreChatAssistantWithSlidingWindowStrategy;
+import com.ai_playground.springai_langchain4j.lc4j.SQLPersistedChatAssistantWithMessageSummarizationStrategy;
+import com.ai_playground.springai_langchain4j.lc4j.SQLPersistedChatAssistantWithSlidingWindowStrategy;
+import com.ai_playground.springai_langchain4j.lc4j.SQLPersistedChatAssistantWithTokenWindowStrategy;
 
 @RestController
 @RequestMapping("/chat-memory-lc4j")
