@@ -152,7 +152,7 @@ http://localhost:8080
 Import:
 
 ```text
-postman_collections/springai-langchian4j.postman_collection.json
+postman_collections/springai-langchain4j.postman_collection.json
 ```
 
 Set the collection variable:
@@ -172,7 +172,7 @@ The collection currently contains these requests:
 ## Application Architecture
 
 ```text
-src/main/java/com/ai_playground/springai_langchian4j/
+src/main/java/com/ai_playground/springai_langchain4j/
   SpringAILangChain4jApplication.java
   AIConfig.java
   controllers/
@@ -186,7 +186,7 @@ src/main/resources/
   coredeux-entities.yml
 
 postman_collections/
-  springai-langchian4j.postman_collection.json
+  springai-langchain4j.postman_collection.json
 
 compose.yaml
 pom.xml
