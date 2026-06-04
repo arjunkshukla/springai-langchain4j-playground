@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.rag.data;
+package com.ai_playground.springai_langchain4j.rag.data;
 
 import java.util.List;
 

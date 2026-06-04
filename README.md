@@ -72,7 +72,7 @@ If you want to inspect the Docker database from pgAdmin or another client, use:
 ## Project structure
 
 ```text
-src/main/java/com/ai_playground/springai_langchian4j/
+src/main/java/com/ai_playground/springai_langchain4j/
   SpringAILangChain4jApplication.java
   AIConfig.java
   controllers/
@@ -105,7 +105,7 @@ src/main/resources/
     app.js
     styles.css
 
-src/test/java/com/ai_playground/springai_langchian4j/
+src/test/java/com/ai_playground/springai_langchain4j/
   SpringAILangChain4jApplicationTests.java
   PgVectorRagIntegrationTest.java
   config/PgVectorTestConfiguration.java
@@ -673,7 +673,7 @@ The root path forwards to the streaming chat UI.
 
 ## Postman collection
 
-The repo includes a Postman collection at [`postman_collections/springai-langchian4j.postman_collection.json`](postman_collections/springai-langchian4j.postman_collection.json).
+The repo includes a Postman collection at [`postman_collections/springai-langchain4j.postman_collection.json`](postman_collections/springai-langchain4j.postman_collection.json).
 
 It mirrors the app's API groups:
 

@@ -1,11 +1,11 @@
-package com.ai_playground.springai_langchian4j;
+package com.ai_playground.springai_langchain4j;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.ai_playground.springai_langchian4j.config.PgVectorTestConfiguration;
+import com.ai_playground.springai_langchain4j.config.PgVectorTestConfiguration;
 
 /**
  * Verifies that the Spring context starts with the Testcontainers-backed pgvector

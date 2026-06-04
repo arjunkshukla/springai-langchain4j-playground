@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.controllers;
+package com.ai_playground.springai_langchain4j.controllers;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
-import com.ai_playground.springai_langchian4j.services.QueryRewriteService;
-import com.ai_playground.springai_langchian4j.services.RAGService;
+import com.ai_playground.springai_langchain4j.services.QueryRewriteService;
+import com.ai_playground.springai_langchain4j.services.RAGService;
 
 import lombok.extern.slf4j.Slf4j;
 

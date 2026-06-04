@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.rag;
+package com.ai_playground.springai_langchain4j.rag;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import com.ai_playground.springai_langchian4j.splitter.MarkdownSectionSplitter;
+import com.ai_playground.springai_langchain4j.splitter.MarkdownSectionSplitter;
 
 /**
  * Applies Spring AI splitters to raw documents before embedding.

@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j;
+package com.ai_playground.springai_langchain4j;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.ai_playground.springai_langchian4j.config.PgVectorTestConfiguration;
+import com.ai_playground.springai_langchain4j.config.PgVectorTestConfiguration;
 
 /**
  * End-to-end check that documents can be stored in pgvector and retrieved back

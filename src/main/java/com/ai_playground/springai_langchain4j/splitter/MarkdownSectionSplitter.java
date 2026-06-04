@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.splitter;
+package com.ai_playground.springai_langchain4j.splitter;
 
 import java.util.ArrayList;
 import java.util.List;

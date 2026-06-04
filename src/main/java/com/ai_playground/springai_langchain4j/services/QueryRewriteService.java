@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.services;
+package com.ai_playground.springai_langchain4j.services;
 
 import java.util.List;
 

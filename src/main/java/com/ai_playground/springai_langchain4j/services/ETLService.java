@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.services;
+package com.ai_playground.springai_langchain4j.services;
 
 import java.util.List;
 import java.util.Map;
@@ -7,8 +7,8 @@ import org.springframework.ai.document.Document;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import com.ai_playground.springai_langchian4j.rag.DocumentReader;
-import com.ai_playground.springai_langchian4j.rag.DocumentSplitter;
+import com.ai_playground.springai_langchain4j.rag.DocumentReader;
+import com.ai_playground.springai_langchain4j.rag.DocumentSplitter;
 
 /**
  * Orchestrates the document ETL pipeline: read, enrich metadata, then split.

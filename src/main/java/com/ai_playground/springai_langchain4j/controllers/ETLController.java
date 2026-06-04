@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.controllers;
+package com.ai_playground.springai_langchain4j.controllers;
 
 import java.util.List;
 import java.util.Map;
@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ai_playground.springai_langchian4j.rag.data.DocumentPreview;
-import com.ai_playground.springai_langchian4j.rag.data.DocumentPreviewResponse;
-import com.ai_playground.springai_langchian4j.services.ETLService;
+import com.ai_playground.springai_langchain4j.rag.data.DocumentPreview;
+import com.ai_playground.springai_langchain4j.rag.data.DocumentPreviewResponse;
+import com.ai_playground.springai_langchain4j.services.ETLService;
 
 /**
  * Lets you inspect how the ingestion pipeline reads and splits documents.

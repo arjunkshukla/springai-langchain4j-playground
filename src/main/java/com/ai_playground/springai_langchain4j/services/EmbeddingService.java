@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.services;
+package com.ai_playground.springai_langchain4j.services;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -20,7 +20,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import com.ai_playground.springai_langchian4j.rag.DocumentReader;
+import com.ai_playground.springai_langchain4j.rag.DocumentReader;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pgvector.PGvector;

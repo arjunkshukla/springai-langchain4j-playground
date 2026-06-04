@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.controllers;
+package com.ai_playground.springai_langchain4j.controllers;
 
 import java.util.List;
 
@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ai_playground.springai_langchian4j.rag.DocumentReader;
-import com.ai_playground.springai_langchian4j.rag.data.DocumentPreview;
-import com.ai_playground.springai_langchian4j.rag.data.DocumentPreviewResponse;
+import com.ai_playground.springai_langchain4j.rag.DocumentReader;
+import com.ai_playground.springai_langchain4j.rag.data.DocumentPreview;
+import com.ai_playground.springai_langchain4j.rag.data.DocumentPreviewResponse;
 
 /**
  * Debug endpoints that show how the different readers extract text.

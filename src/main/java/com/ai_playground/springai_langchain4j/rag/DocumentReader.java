@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.rag;
+package com.ai_playground.springai_langchain4j.rag;
 
 import java.io.IOException;
 import java.util.Arrays;

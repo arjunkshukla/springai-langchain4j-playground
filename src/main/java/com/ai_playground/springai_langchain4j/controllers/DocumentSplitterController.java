@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.controllers;
+package com.ai_playground.springai_langchain4j.controllers;
 
 import java.util.List;
 
@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ai_playground.springai_langchian4j.rag.DocumentSplitter;
-import com.ai_playground.springai_langchian4j.rag.data.DocumentPreview;
-import com.ai_playground.springai_langchian4j.rag.data.DocumentPreviewResponse;
+import com.ai_playground.springai_langchain4j.rag.DocumentSplitter;
+import com.ai_playground.springai_langchain4j.rag.data.DocumentPreview;
+import com.ai_playground.springai_langchain4j.rag.data.DocumentPreviewResponse;
 
 /**
  * Simple inspection endpoint for the splitter behavior.

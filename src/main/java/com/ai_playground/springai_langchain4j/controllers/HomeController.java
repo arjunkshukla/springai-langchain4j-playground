@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.controllers;
+package com.ai_playground.springai_langchain4j.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
