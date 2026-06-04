@@ -44,7 +44,7 @@ The `langchain4j` dependency is still present in the build, but the current bran
 ## Project structure
 
 ```text
-src/main/java/com/ai_playground/springai_langchian4j/
+src/main/java/com/ai_playground/springai_langchain4j/
   SpringAILangChain4jApplication.java
   AIConfig.java
   controllers/GenerativeController.java
@@ -180,5 +180,5 @@ The `call()` path is synchronous, so the request thread waits until the model re
 - [`pom.xml`](pom.xml)
 - [`compose.yaml`](compose.yaml)
 - [`src/main/resources/application.properties`](src/main/resources/application.properties)
-- [`src/main/java/com/ai_playground/springai_langchian4j/AIConfig.java`](src/main/java/com/ai_playground/springai_langchian4j/AIConfig.java)
-- [`src/main/java/com/ai_playground/springai_langchian4j/controllers/GenerativeController.java`](src/main/java/com/ai_playground/springai_langchian4j/controllers/GenerativeController.java)
+- [`src/main/java/com/ai_playground/springai_langchain4j/AIConfig.java`](src/main/java/com/ai_playground/springai_langchain4j/AIConfig.java)
+- [`src/main/java/com/ai_playground/springai_langchain4j/controllers/GenerativeController.java`](src/main/java/com/ai_playground/springai_langchain4j/controllers/GenerativeController.java)
