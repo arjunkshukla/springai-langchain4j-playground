@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.dto;
+package com.ai_playground.springai_langchain4j.dto;
 
 import java.util.List;
 

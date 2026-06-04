@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.controllers;
+package com.ai_playground.springai_langchain4j.controllers;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ai_playground.springai_langchian4j.dto.MeetingSummary;
+import com.ai_playground.springai_langchain4j.dto.MeetingSummary;
 
 @RestController
 @RequestMapping("/response-mapping")

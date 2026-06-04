@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.renderer;
+package com.ai_playground.springai_langchain4j.renderer;
 
 import java.util.Map;
 import java.util.regex.Matcher;
