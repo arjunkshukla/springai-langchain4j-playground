@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j;
+package com.ai_playground.springai_langchain4j;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.ai_playground.springai_langchian4j.tools.DemoTools;
+import com.ai_playground.springai_langchain4j.tools.DemoTools;
 
 /**
  * Central Spring AI configuration for regular chat and tool-enabled chat clients.

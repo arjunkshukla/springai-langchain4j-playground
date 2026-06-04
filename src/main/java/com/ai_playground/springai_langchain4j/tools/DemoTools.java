@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.tools;
+package com.ai_playground.springai_langchain4j.tools;
 
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j.controllers;
+package com.ai_playground.springai_langchain4j.controllers;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ai_playground.springai_langchian4j.tools.DemoTools;
+import com.ai_playground.springai_langchain4j.tools.DemoTools;
 
 /**
  * Demonstrates dynamic Spring AI tools by creating {@link FunctionToolCallback} instances per request.
