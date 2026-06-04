@@ -308,12 +308,10 @@ Validates the cart ID, product code, and quantity, then simulates adding the ite
 ### Book-Flight Tool
 
 ```java
-bookFight(String from, String to, String date)
+bookFlight(String from, String to, String date)
 ```
 
 Validates the departure location, destination, and date, then simulates a flight booking.
-
-The method name is currently `bookFight`, while its description and behavior refer to booking a flight.
 
 ## Tools Controller
 
@@ -494,7 +492,7 @@ The controller dynamically wraps these `DemoTools` methods with `FunctionToolCal
 - `getCurrentWeather` calls `DemoTools.getWeather(...)`
 - `getExchangeRate` calls `DemoTools.getExchangeRate(...)`
 - `addToCart` calls `DemoTools.addToCart(...)`
-- `bookFlight` calls `DemoTools.bookFight(...)`
+- `bookFlight` calls `DemoTools.bookFlight(...)`
 
 Each callback uses a Java record as its input schema. Spring AI generates the JSON schema exposed to the model from the record type.
 
@@ -647,7 +645,7 @@ The Postman collection is the primary manual test reference for the current endp
 - tool methods log through `System.out.println` rather than a structured logger
 - the Compose file starts Ollama only; it does not start PostgreSQL or the Spring Boot application
 - LangChain4j dependencies and properties exist, but the current source tree does not expose a LangChain4j endpoint
-- the method `bookFight(...)` contains a naming typo and represents a simulated flight booking
+- the method `bookFlight(...)` represents a simulated flight booking
 
 ## Quick Endpoint Reference
 

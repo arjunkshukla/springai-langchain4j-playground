@@ -117,13 +117,13 @@ public class FunctionCallbackController {
 	}
 
 	/**
-	 * Creates a request-time flight booking callback backed by {@link DemoTools#bookFight(String, String, String)}.
+	 * Creates a request-time flight booking callback backed by {@link DemoTools#bookFlight(String, String, String)}.
 	 */
 	private ToolCallback bookFlightToolCallback() {
 		System.out.println("Creating book flight tool callback...");
 		return FunctionToolCallback
 				.builder("bookFlight",
-						(BookFlightRequest request) -> demoTools.bookFight(request.from(), request.to(),
+						(BookFlightRequest request) -> demoTools.bookFlight(request.from(), request.to(),
 								request.date()))
 				.description("Book a flight for a specific route and date.").inputType(BookFlightRequest.class).build();
 	}

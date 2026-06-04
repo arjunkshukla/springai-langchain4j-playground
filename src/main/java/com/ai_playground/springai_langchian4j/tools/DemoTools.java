@@ -64,7 +64,7 @@ public class DemoTools {
 	 * Simulates booking a flight between two locations on a requested date.
 	 */
 	@Tool(description = "Book a flight for a specific route and date.")
-	public String bookFight(String from, String to, String date) {
+	public String bookFlight(String from, String to, String date) {
 		if (from == null || to == null || date == null || from.isEmpty() || to.isEmpty() || date.isEmpty()) {
 			return "Please provide valid departure location, destination, and date.";
 		} else {
