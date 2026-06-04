@@ -1,52 +1,181 @@
 # springai-langchain4j-playground
 
-This repository is a small Spring Boot playground for experimenting with Spring AI chat and tool calling.
+This repository is a Spring Boot playground for learning Spring AI tool calling, request-time function callbacks, tool disabling, and persisted conversational memory.
 
-The current code path is focused on Spring AI `ChatClient` with an OpenAI-backed chat model. Earlier Ollama experiments are useful because they show an important difference between "model supports tool calls" and "model reliably uses tool results."
+The active application uses OpenAI with `gpt-4o-mini` and stores chat memory in PostgreSQL. The repository also includes an Ollama Docker Compose file for local-model experiments and for reproducing the tool-calling observations documented below.
 
-## What this branch demonstrates
+## Ollama With Docker Compose
 
-- a primary Spring AI `ChatClient` for normal chat requests
-- a second Spring AI `ChatClient` configured with local Java tools
-- a request-time dynamic tool callback endpoint using `FunctionToolCallback`
-- plain HTTP endpoints for chat, joke generation, and tool-backed questions
-- the practical difference between Ollama local tool calling and OpenAI tool calling
+The included [`compose.yaml`](compose.yaml) starts a single Ollama container:
 
-## Runtime model setup
+- container name: `codebase-ollama-1`
+- host URL: `http://localhost:11434`
+- persistent model volume: `ollama_storage`
 
-The app currently uses OpenAI as the chat provider.
+> Important: the current application configuration uses OpenAI, not Ollama. The Compose file is retained for local Ollama experiments. The current POM does not include the Spring AI Ollama starter, so switching the application itself back to Ollama also requires adding that dependency and changing `application.properties`.
 
-Configuration lives in `src/main/resources/application.properties`:
+### Start Ollama
+
+From the project root:
+
+```powershell
+docker compose -f compose.yaml up -d
+```
+
+### Check Container Status
+
+```powershell
+docker compose -f compose.yaml ps
+```
+
+### Pull a Tool-Capable Model
+
+`llama3` does not support tools. Pull `llama3.1` for tool-calling experiments:
+
+```powershell
+docker exec -it codebase-ollama-1 ollama pull llama3.1
+```
+
+### List Installed Models
+
+```powershell
+docker exec -it codebase-ollama-1 ollama list
+```
+
+### Run the Model Interactively
+
+```powershell
+docker exec -it codebase-ollama-1 ollama run llama3.1
+```
+
+Exit the interactive model session with `/bye`.
+
+### Stop Ollama
+
+Stops and removes the container while preserving the downloaded models in `ollama_storage`:
+
+```powershell
+docker compose -f compose.yaml down
+```
+
+### Remove Ollama and Downloaded Models
+
+This also deletes the persistent `ollama_storage` volume:
+
+```powershell
+docker compose -f compose.yaml down -v
+```
+
+## Current Runtime Requirements
+
+The current application requires:
+
+- Java 21
+- Maven or the included Maven wrapper
+- an OpenAI API key
+- a running PostgreSQL database
+- database `springai_langchain4j`
+
+The included Compose file does **not** start PostgreSQL.
+
+### OpenAI Configuration
+
+The application reads:
 
 ```properties
-spring.application.name=springai-langchain4j
-
 spring.ai.model.chat=openai
 spring.ai.openai.api-key=${OPENAI_API_KEY:}
 spring.ai.openai.chat.options.model=${OPENAI_CHAT_MODEL:gpt-4o-mini}
-
-app.langchain4j.openai.api-key=${OPENAI_API_KEY:}
-app.langchain4j.openai.model-name=${OPENAI_CHAT_MODEL:gpt-4o-mini}
 ```
 
-Required environment variable:
+Set the required API key in PowerShell:
 
-- `OPENAI_API_KEY`
+```powershell
+$env:OPENAI_API_KEY="your-api-key"
+```
 
-Optional environment variable:
+Optionally override the default model:
 
-- `OPENAI_CHAT_MODEL`
+```powershell
+$env:OPENAI_CHAT_MODEL="gpt-4o-mini"
+```
 
-If `OPENAI_CHAT_MODEL` is not set, the app defaults to `gpt-4o-mini`.
+### PostgreSQL Configuration
 
-## Project structure
+The application connects to:
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/springai_langchain4j
+spring.datasource.username=${POSTGRES_USER:postgres}
+spring.datasource.password=${POSTGRES_PASSWORD:postgres}
+```
+
+Optional environment overrides:
+
+```powershell
+$env:POSTGRES_USER="postgres"
+$env:POSTGRES_PASSWORD="postgres"
+```
+
+The PostgreSQL server and `springai_langchain4j` database must already exist before the application starts.
+
+Spring AI initializes its JDBC chat-memory schema automatically:
+
+```properties
+spring.ai.chat.memory.repository.jdbc.initialize-schema=always
+```
+
+This initializes the Spring AI memory tables inside the existing database. It does not create the PostgreSQL server or database.
+
+## Run the Application
+
+Using the Maven wrapper:
+
+```powershell
+./mvnw spring-boot:run
+```
+
+Or using a locally installed Maven:
+
+```powershell
+mvn spring-boot:run
+```
+
+The default application URL is:
+
+```text
+http://localhost:8080
+```
+
+## Postman Collection
+
+Import:
+
+```text
+postman_collections/springai-langchian4j.postman_collection.json
+```
+
+Set the collection variable:
+
+```text
+host = http://localhost:8080
+```
+
+The collection currently contains these requests:
+
+| Folder | Request | Endpoint |
+|---|---|---|
+| Tools | With Tools | `GET /tools/ask` |
+| Tools | Disabling Preconfigured Tools | `GET /tools/disabled-tools` |
+| Function Callback | Dynamic Tools | `GET /function-callback/ask` |
+
+## Application Architecture
 
 ```text
 src/main/java/com/ai_playground/springai_langchian4j/
   SpringAILangChain4jApplication.java
   AIConfig.java
   controllers/
-    GenerativeController.java
     ToolsController.java
     FunctionCallbackController.java
   tools/
@@ -56,301 +185,483 @@ src/main/resources/
   application.properties
   coredeux-entities.yml
 
+postman_collections/
+  springai-langchian4j.postman_collection.json
+
 compose.yaml
 pom.xml
 ```
 
-## Application wiring
+The current source tree is Spring AI focused. LangChain4j dependencies and configuration properties remain available for later experiments, but there is no active LangChain4j controller in the current application.
 
-### `AIConfig`
+## Spring AI Configuration
 
-`AIConfig` defines two Spring AI clients:
+### Primary Chat Client
 
-- `chatClient`
-- `toolChatClient`
+`AIConfig.chatClient(...)` creates the primary `ChatClient`.
 
-`chatClient` is the primary bean and is used by the regular `/ask` and `/joke` endpoints.
+It uses this default system prompt:
 
-`toolChatClient` registers `DemoTools` via:
+```text
+You are a helpful Java Assistant
+```
+
+This client does not have tools registered by default.
+
+### Static Tool Chat Client
+
+`AIConfig.toolChatClient(...)` creates a separate tool-enabled `ChatClient`.
+
+It statically registers the Spring-managed `DemoTools` component:
 
 ```java
 .defaultTools(demoTools)
 ```
 
-It also uses a stricter system prompt so that tool results are treated as authoritative when the model produces a final answer.
+Every request made through this client exposes all `@Tool` methods from `DemoTools` to the model.
 
-### `GenerativeController`
+Its system prompt instructs the model to:
 
-`GenerativeController` exposes the regular chat endpoints:
+- treat tool results as authoritative
+- preserve factual values returned by tools
+- avoid replacing tool results with inferred information
+- answer all parts of compound questions
+- avoid mentioning tool names unless asked
 
-```text
-GET /ask?question=...
-GET /joke?topic=...
-```
+### JDBC Chat Memory Repository
 
-`/ask` sends the user question to the primary Spring AI `ChatClient`.
+`AIConfig.chatMemoryRepository(...)` creates a `JdbcChatMemoryRepository` backed by Spring's `JdbcTemplate`.
 
-`/joke` adds a comedian-style system prompt and asks for a joke about the supplied topic.
+This stores chat-memory messages in PostgreSQL rather than only keeping them in application memory.
 
-### `ToolsController`
+### Persisted Message Window
 
-`ToolsController` exposes:
-
-```text
-GET /tools/ask?question=...
-```
-
-This endpoint uses the `toolChatClient`, so the model can request Java tool execution before producing the final response.
-
-Example:
-
-```text
-GET /tools/ask?question=how%20is%20sydney's%20weather%20today%3F%20and%20tell%20me%20what%20is%202%20%2B%202%3F
-```
-
-Expected behavior with `gpt-4o-mini`:
-
-```text
-The current weather in Sydney is purple snow with 123C.
-
-As for the mathematical operation, 2 + 2 equals 4.
-```
-
-### `FunctionCallbackController`
-
-`FunctionCallbackController` exposes:
-
-```text
-GET /function-callback/ask?question=...
-```
-
-This endpoint demonstrates dynamic tools. Instead of registering a static tool bean on the `ChatClient`, it builds a request-specific list of `FunctionToolCallback` instances and passes them into:
+`AIConfig.persistedChatMemory(...)` creates a `MessageWindowChatMemory`:
 
 ```java
-.toolCallbacks(toolCallbacks)
+MessageWindowChatMemory.builder()
+    .maxMessages(10)
+    .chatMemoryRepository(chatMemoryRepository)
+    .build();
 ```
 
-The controller currently exposes only the callbacks relevant to the incoming question:
+Each conversation keeps a window of up to 10 messages, persisted through the JDBC repository.
 
-- weather questions get a weather callback
-- exchange/currency questions get an exchange-rate callback
-- cart questions get an add-to-cart callback
-- flight questions get a book-flight callback
-- arithmetic expressions get a calculator callback
+### Persisted Chat Client
 
-Example:
+`AIConfig.persistedChatClient(...)` creates a named `persistedChatClient`.
+
+It installs a `MessageChatMemoryAdvisor`, which automatically:
+
+- loads prior messages for a conversation
+- adds them to the model request
+- stores new conversation messages after the response
+
+The conversation is selected using `ChatMemory.CONVERSATION_ID`.
+
+## Static Tools
+
+`DemoTools` is a Spring component containing methods annotated with `@Tool`.
+
+These tools are registered statically on `toolChatClient`.
+
+### Weather Tool
+
+```java
+getWeather(String location)
+```
+
+Returns hardcoded demo weather data:
+
+| Location | Result |
+|---|---|
+| New York | cloudy, `20C` |
+| Los Angeles | sunny, `30C` |
+| Sydney | purple snow, `123C` |
+| Other locations | sunny, `25C` |
+
+The intentionally unrealistic Sydney result is a sentinel value. It makes it easy to verify whether the model preserves the actual tool result.
+
+### Exchange-Rate Tool
+
+```java
+getExchangeRate(String fromCurrency, String toCurrency)
+```
+
+Returns hardcoded exchange rates for:
+
+- USD to EUR
+- EUR to USD
+- USD to JPY
+- JPY to USD
+
+Unknown currency pairs return a demo rate of `1.00`.
+
+### Add-to-Cart Tool
+
+```java
+addToCart(String cartId, String productCode, int quantity)
+```
+
+Validates the cart ID, product code, and quantity, then simulates adding the item to a cart. The method logs the operation and returns a confirmation string.
+
+### Book-Flight Tool
+
+```java
+bookFight(String from, String to, String date)
+```
+
+Validates the departure location, destination, and date, then simulates a flight booking.
+
+The method name is currently `bookFight`, while its description and behavior refer to booking a flight.
+
+## Tools Controller
+
+Base path:
 
 ```text
-GET /function-callback/ask?question=how%20is%20sydney's%20weather%20today%3F%20and%20tell%20me%20what%20is%202%20%2B%202%3F
+/tools
 ```
 
-That request exposes the weather and calculator callbacks for that call only.
+`ToolsController` uses the statically configured `toolChatClient`.
 
-### `DemoTools`
+### Use Preconfigured Tools
 
-`DemoTools` is a local Java tool component.
+```http
+GET /tools/ask?question=How is the weather in Sydney today?
+```
 
-It currently contains these annotated tool methods:
-
-- `getWeather(String location)`
-- `getExchangeRate(String fromCurrency, String toCurrency)`
-- `addToCart(String cartId, String productCode, int quantity)`
-- `bookFight(String from, String to, String date)`
-
-These methods do not call live external APIs. They return hardcoded sample values so tool behavior is easy to test.
-
-The Sydney weather response is intentionally unrealistic in the current experiment:
+Postman request:
 
 ```text
-The current weather in Sydney is purple snow with 123C.
+Tools / With Tools
 ```
 
-That sentinel value makes it obvious whether the model preserved the Java tool result or invented its own answer.
+Flow:
 
-## Tool-calling observations
+1. The question is sent through `toolChatClient`.
+2. All `DemoTools` methods are available to the model.
+3. The model decides whether a tool is needed.
+4. Spring AI executes the selected Java method.
+5. The tool result is sent back to the model.
+6. The model produces the final response.
 
-### Finding: Ollama `llama3` does not support tools
+For the Sydney example, the expected tool-backed fact is the sentinel result: purple snow at `123C`.
 
-Using Ollama with `llama3` failed immediately for tool-backed requests.
+### Disable Preconfigured Tools Per Request
 
-Observed error:
+```http
+GET /tools/disabled-tools?question=How is the weather in Sydney today?
+```
+
+Postman request:
+
+```text
+Tools / Disabling Preconfigured Tools
+```
+
+This endpoint still uses `toolChatClient`, where tools are registered, but disables them for this specific OpenAI request:
+
+```java
+OpenAiChatOptions.builder()
+    .toolChoice("none")
+    .internalToolExecutionEnabled(false)
+    .build()
+```
+
+The two options serve different purposes:
+
+- `toolChoice("none")` tells OpenAI not to select a tool.
+- `internalToolExecutionEnabled(false)` prevents Spring AI's internal tool-execution lifecycle for the request.
+
+This example intentionally applies the disabling options to a client that has tools registered. Using these options on a client with no registered tools is not the scenario being demonstrated.
+
+## Dynamic Function Callbacks
+
+Base path:
+
+```text
+/function-callback
+```
+
+### Dynamic Tools Endpoint
+
+```http
+GET /function-callback/ask?question=add to cart for product prod001&sessionId=session-1
+```
+
+Postman request:
+
+```text
+Function Callback / Dynamic Tools
+```
+
+Required query parameters:
+
+| Parameter | Purpose |
+|---|---|
+| `question` | User request sent to the model |
+| `sessionId` | Conversation ID used by persisted chat memory |
+
+`FunctionCallbackController` uses `persistedChatClient`, so requests using the same `sessionId` share a persisted conversation history.
+
+### How Dynamic Tools Differ From Static Tools
+
+Static tools are registered once when `toolChatClient` is built:
+
+```java
+.defaultTools(demoTools)
+```
+
+Dynamic tools are built inside the controller for each request:
+
+```java
+List<ToolCallback> toolCallbacks = new ArrayList<>();
+toolCallbacks.add(...);
+
+chatClient.prompt()
+    .toolCallbacks(toolCallbacks)
+    .call();
+```
+
+In the current implementation, **all dynamic callbacks are created and registered on every request**. The model then decides which callback or callbacks to execute.
+
+Console messages such as:
+
+```text
+Creating weather tool callback...
+Creating add to cart tool callback...
+```
+
+mean the callback was created and made available to the model. They do not mean the tool was executed.
+
+Execution-specific messages such as:
+
+```text
+Adding 5 of product PROD001 to cart 0001.
+Generating OTP...
+```
+
+mean the model actually selected and invoked that tool.
+
+### Dynamic OTP Callback
+
+Tool name:
+
+```text
+getOTP
+```
+
+The callback accepts no input and generates a random six-digit OTP:
+
+```text
+Your OTP is: 123456
+```
+
+### Dynamic Bank Transfer Callback
+
+Tool name:
+
+```text
+transferAmount
+```
+
+Input schema:
+
+```text
+amount
+payee
+confirmationId
+```
+
+The callback validates each required field. If a value is missing, it tells the model to ask the user for that value and retry.
+
+This tool demonstrates why persisted conversation memory is useful. A user can provide transfer information across multiple requests using the same `sessionId`.
+
+Example conversation:
+
+```text
+GET /function-callback/ask?question=Transfer 50 dollars to Alex&sessionId=transfer-demo
+GET /function-callback/ask?question=The confirmation ID is ABC123&sessionId=transfer-demo
+```
+
+The persisted memory allows the second request to retain context from the first request.
+
+### Dynamic Wrappers Around DemoTools
+
+The controller dynamically wraps these `DemoTools` methods with `FunctionToolCallback`:
+
+- `getCurrentWeather` calls `DemoTools.getWeather(...)`
+- `getExchangeRate` calls `DemoTools.getExchangeRate(...)`
+- `addToCart` calls `DemoTools.addToCart(...)`
+- `bookFlight` calls `DemoTools.bookFight(...)`
+
+Each callback uses a Java record as its input schema. Spring AI generates the JSON schema exposed to the model from the record type.
+
+### Dynamic Calculator Callback
+
+Tool name:
+
+```text
+calculate
+```
+
+Input schema:
+
+```text
+left
+operator
+right
+```
+
+Supported operators:
+
+- `+`, `add`, `plus`
+- `-`, `subtract`, `minus`
+- `*`, `multiply`, `times`
+- `/`, `divide`
+
+The calculator uses `BigDecimal`. Division uses `MathContext.DECIMAL64`, and division by zero returns an error-style message rather than throwing an arithmetic exception.
+
+## Persisted Conversation Memory
+
+Dynamic callback requests use:
+
+```java
+.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId))
+```
+
+This passes the request's `sessionId` to `MessageChatMemoryAdvisor`.
+
+Behavior:
+
+- same `sessionId`: continues the same remembered conversation
+- different `sessionId`: starts or continues a separate conversation
+- application restart: conversation memory remains available because it is stored in PostgreSQL
+- message window: only the configured latest 10 messages are retained by `MessageWindowChatMemory`
+
+Use stable, non-sensitive session IDs in demos. In a production system, conversation IDs should be tied to authenticated users and authorized before memory is loaded.
+
+## Tool-Calling Findings
+
+### Ollama `llama3` Does Not Support Tools
+
+Using `llama3` for a tool-backed request returned:
 
 ```text
 HTTP 400 - {"error":"registry.ollama.ai/library/llama3:latest does not support tools"}
 ```
 
-Resolution for that specific error:
-
-```properties
-spring.ai.ollama.chat.options.model=llama3.1
-```
-
-`llama3.1` supports tool calling, while `llama3` does not.
-
-### Finding: `llama3.1` can call tools, but final answers were unreliable
-
-After switching from `llama3` to `llama3.1`, the model could invoke the Java tool. Debugging confirmed that Spring AI called:
-
-```text
-getWeather("Sydney")
-```
-
-However, the final model response was inconsistent. Observed behavior included:
-
-- replacing the tool result with plausible live-weather text
-- formatting invented OpenWeather-style JSON
-- saying the tool result was used instead of answering the user
-- hallucinating extra tools such as a weather API tool or calculator tool
-- failing compound prompts like weather plus `2 + 2`
-
-The important lesson: tool support only means the model can request tool execution. It does not guarantee that the model will faithfully preserve the tool result in its final answer.
-
-### Finding: `returnDirect = true` is exact but too limited for compound prompts
-
-Spring AI tools can use `returnDirect = true`.
-
-That makes Spring AI return the Java tool result directly after the tool executes.
-
-This fixed simple prompts like:
-
-```text
-how is sydney's weather today?
-```
-
-But it broke compound prompts like:
-
-```text
-how is sydney's weather today? and tell me what is 2 + 2?
-```
-
-Because the response stops at the weather tool result, the model does not continue and answer the math question.
-
-Conclusion: `returnDirect = true` is useful when the endpoint should return only the tool result. It is not a good fit for general multi-part assistant prompts.
-
-### Resolution: switch the tool client to OpenAI
-
-Switching the chat provider to OpenAI with `gpt-4o-mini` resolved the observed compound prompt issue.
-
-With the current OpenAI configuration, the model:
-
-- calls the Spring AI tool
-- preserves the sentinel weather result
-- continues answering the rest of the prompt
-
-Example result:
-
-```text
-The current weather in Sydney is purple snow with a temperature of 123C.
-
-As for the mathematical operation, 2 + 2 equals 4.
-```
-
-This is the behavior expected from a tool-using assistant: use tools for tool-backed facts, then continue reasoning over the full user request.
-
-## Notes on Ollama
-
-The repo still includes `compose.yaml` for running Ollama locally, and the POM still includes the Ollama starter. That makes it easy to continue local-model experiments.
-
-If you switch back to Ollama for tool testing:
+`llama3.1` supports tool calling and can be pulled with:
 
 ```powershell
-docker compose -f compose.yaml up -d
 docker exec -it codebase-ollama-1 ollama pull llama3.1
 ```
 
-Then configure:
+### Ollama `llama3.1` Could Call Tools but Was Unreliable
 
-```properties
-spring.ai.model.chat=ollama
-spring.ai.ollama.base-url=http://localhost:11434
-spring.ai.ollama.chat.options.model=llama3.1
-```
+Debugging confirmed that `llama3.1` requested and executed the Java weather tool with `Sydney`.
 
-Use that path for experimentation, but expect weaker tool-result fidelity than OpenAI for compound prompts.
+However, its final responses were inconsistent. Observed behavior included:
 
-## Running locally
+- replacing the tool result with plausible but invented weather
+- producing invented OpenWeather-style JSON
+- mentioning tool mechanics instead of answering the question
+- hallucinating unavailable tools
+- failing to combine tool results with other parts of a compound question
 
-### 1. Set the OpenAI key
+The key finding is:
 
-Make sure `OPENAI_API_KEY` is available to the process that runs the app.
+> A model supporting tool calls does not guarantee reliable tool selection, faithful use of tool results, or correct final-answer synthesis.
 
-PowerShell example:
+### `returnDirect = true` Trade-Off
 
-```powershell
-$env:OPENAI_API_KEY="..."
-```
+Using `returnDirect = true` makes Spring AI return a tool result immediately without sending it back to the model for final synthesis.
 
-Optional model override:
+This preserves the exact tool result for simple requests, but it stops compound prompts after the first direct-return tool result.
 
-```powershell
-$env:OPENAI_CHAT_MODEL="gpt-4o-mini"
-```
+For example, a weather tool could answer the weather portion but prevent the model from continuing with a second request such as `2 + 2`.
 
-### 2. Run the application
+### Resolution: OpenAI `gpt-4o-mini`
 
-```powershell
-./mvnw spring-boot:run
-```
+Switching the application to OpenAI `gpt-4o-mini` produced the expected behavior:
 
-or:
+- the correct Java tool was invoked
+- the tool's sentinel result was preserved
+- compound questions continued after tool execution
+- the model combined tool-backed facts with normal reasoning
 
-```powershell
-mvn spring-boot:run
-```
-
-### 3. Call the endpoints
-
-Regular chat:
-
-```text
-GET /ask?question=What%20is%20Spring%20AI?
-```
-
-Joke generation:
-
-```text
-GET /joke?topic=Spring%20Boot
-```
-
-Tool-backed chat:
-
-```text
-GET /tools/ask?question=how%20is%20sydney's%20weather%20today%3F
-```
-
-Compound tool-backed prompt:
-
-```text
-GET /tools/ask?question=how%20is%20sydney's%20weather%20today%3F%20and%20tell%20me%20what%20is%202%20%2B%202%3F
-```
-
-Dynamic tool callback example:
-
-```text
-GET /function-callback/ask?question=how%20is%20sydney's%20weather%20today%3F%20and%20tell%20me%20what%20is%202%20%2B%202%3F
-```
+The Spring AI wiring remained largely the same. The model/provider change resolved the unreliable orchestration behavior observed with the local Ollama model.
 
 ## Dependencies
 
-The POM includes:
+Key dependencies in `pom.xml`:
 
-- Spring Boot Web
-- Spring AI OpenAI starter
-- Spring AI Ollama starter
-- LangChain4j Spring Boot starter
-- Spring Boot test support
-- Coredeux starter dependencies used by the project setup
+| Dependency | Purpose |
+|---|---|
+| `spring-boot-starter` | Core Spring Boot runtime |
+| `spring-boot-starter-web` | REST controllers and embedded web server |
+| `spring-ai-starter-model-openai` | Spring AI OpenAI chat model integration |
+| `spring-ai-starter-model-chat-memory-repository-jdbc` | JDBC-backed Spring AI chat memory |
+| `postgresql` | PostgreSQL JDBC driver |
+| `langchain4j-spring-boot-starter` | LangChain4j Spring Boot support retained for experiments |
+| `langchain4j-open-ai-spring-boot-starter` | LangChain4j OpenAI integration retained for experiments |
+| `spring-boot-starter-test` | Spring Boot and JUnit test support |
+| Coredeux starters | Project-specific Coredeux integrations |
 
-The active application code in this branch is currently Spring AI focused. LangChain4j dependencies remain in the build, but there is no active LangChain4j controller in `src/main/java`.
+Version highlights:
 
-## Summary
+- Java `21`
+- Spring Boot `3.5.14`
+- Spring AI `1.1.6`
+- LangChain4j `1.10.0`
 
-This experiment showed that the Spring AI wiring was not the problem.
+## Testing
 
-The model/provider choice mattered:
+The current automated test is a Spring Boot context-load test:
 
-- Ollama `llama3`: failed because tools are not supported.
-- Ollama `llama3.1`: called tools, but final answers were unreliable for compound prompts.
-- OpenAI `gpt-4o-mini`: preserved tool output and answered the full compound request.
+```java
+@SpringBootTest
+class SpringAILangChain4jApplicationTests {
 
-For this branch, OpenAI is the recommended provider for tool-calling demos.
+    @Test
+    void contextLoads() {
+    }
+}
+```
+
+Because application startup requires OpenAI configuration and PostgreSQL connectivity, ensure the required environment and database are available before running:
+
+```powershell
+mvn test
+```
+
+The Postman collection is the primary manual test reference for the current endpoints.
+
+## Current Limitations
+
+- tool implementations are demos and do not call real weather, exchange-rate, cart, flight, OTP delivery, or banking systems
+- OTP generation uses `Math.random()` and is not suitable for security-sensitive use
+- bank transfer behavior is simulated and does not perform a real transfer
+- all dynamic callbacks are registered on every dynamic-tools request
+- tool methods log through `System.out.println` rather than a structured logger
+- the Compose file starts Ollama only; it does not start PostgreSQL or the Spring Boot application
+- LangChain4j dependencies and properties exist, but the current source tree does not expose a LangChain4j endpoint
+- the method `bookFight(...)` contains a naming typo and represents a simulated flight booking
+
+## Quick Endpoint Reference
+
+```text
+GET /tools/ask
+    question: required
+    Uses statically registered tools.
+
+GET /tools/disabled-tools
+    question: required
+    Uses the tool-enabled client but disables tools for the request.
+
+GET /function-callback/ask
+    question: required
+    sessionId: required
+    Uses request-time FunctionToolCallbacks and persisted PostgreSQL chat memory.
+```

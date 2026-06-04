@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Locale;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,7 +32,7 @@ public class FunctionCallbackController {
 	/**
 	 * Creates the controller with a plain chat client and reusable demo business logic.
 	 */
-	public FunctionCallbackController(ChatClient chatClient, DemoTools demoTools) {
+	public FunctionCallbackController(@Qualifier("persistedChatClient") ChatClient chatClient, DemoTools demoTools) {
 		this.chatClient = chatClient;
 		this.demoTools = demoTools;
 	}
@@ -39,7 +41,7 @@ public class FunctionCallbackController {
 	 * Builds the dynamic tool callback list and lets the model decide which callbacks to call.
 	 */
 	@GetMapping("/ask")
-	public String ask(@RequestParam String question) {
+	public String ask(@RequestParam String question, @RequestParam String sessionId) {
 		List<ToolCallback> toolCallbacks = new ArrayList<>();
 		
 		toolCallbacks.add(FunctionToolCallback
@@ -75,7 +77,7 @@ public class FunctionCallbackController {
 				Treat tool results as authoritative and preserve their factual values.
 				If the user asks multiple questions, answer every part of the request.
 				Do not mention tool names unless the user asks.
-				""").user(question).toolCallbacks(toolCallbacks).call().content();
+				""").user(question).toolCallbacks(toolCallbacks).advisors(a -> a.param(ChatMemory.CONVERSATION_ID, sessionId)).call().content();
 	}
 
 	/**
