@@ -1,8 +1,30 @@
 # springai-langchain4j-playground
 
-This repository is a Spring Boot playground for comparing Spring AI and LangChain4j on the same basic OpenAI-backed setup.
+This repository is a Spring Boot playground for comparing Spring AI and LangChain4j and exploring related AI integration patterns.
 
-The current branch, `base-example-with-openai-sdk`, is intentionally simple:
+The current branch, `model-context-protocol`, introduces a second standalone application:
+
+- the existing `springai-langchain4j` application remains at the repository root
+- the new [`springai-mcp-server`](springai-mcp-server/README.md) application exposes sandboxed local files as read-only MCP resources
+- the MCP server runs independently on port `8081`
+- the MCP server does not require an LLM or API key
+
+Run the MCP server:
+
+```powershell
+cd springai-mcp-server
+mvn spring-boot:run
+```
+
+Connect an MCP client that supports Streamable HTTP to:
+
+```text
+http://localhost:8081/mcp
+```
+
+See [`springai-mcp-server/README.md`](springai-mcp-server/README.md) for its resource URIs, configuration, security boundary, and usage instructions.
+
+The existing root application remains intentionally simple:
 
 - one Spring AI `ChatClient` configured with the OpenAI SDK
 - one LangChain4j `ChatModel` configured with OpenAI

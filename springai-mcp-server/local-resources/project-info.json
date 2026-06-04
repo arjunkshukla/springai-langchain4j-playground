@@ -1,0 +1,5 @@
+{
+  "name": "springai-mcp-server",
+  "purpose": "Expose sandboxed local resources through MCP",
+  "access": "read-only"
+}
