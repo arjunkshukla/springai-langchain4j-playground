@@ -1,4 +1,4 @@
-package com.ai_playground.springai_langchian4j;
+package com.ai_playground.springai_langchain4j;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
