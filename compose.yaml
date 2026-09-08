@@ -7,9 +7,9 @@ services:
     volumes:
       - ollama_storage:/root/.ollama
 
-  pgvector:
-    container_name: codebase-pgvector-1
-    image: pgvector/pgvector:pg16
+  postgres:
+    container_name: codebase-postgres-1
+    image: postgres:16
     environment:
       POSTGRES_DB: rag
       POSTGRES_USER: test
@@ -17,15 +17,34 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - pgvector_storage:/var/lib/postgresql/data
+      - postgres_storage:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U test -d rag"]
       interval: 5s
       timeout: 5s
       retries: 10
 
+  elasticsearch:
+    container_name: codebase-elasticsearch-1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: -Xms1g -Xmx1g
+    ports:
+      - "9201:9200"
+    volumes:
+      - elasticsearch_storage:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
 volumes:
   ollama_storage:
     driver: local
-  pgvector_storage:
+  postgres_storage:
+    driver: local
+  elasticsearch_storage:
     driver: local

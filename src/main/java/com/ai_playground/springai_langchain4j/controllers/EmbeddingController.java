@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ai_playground.springai_langchain4j.services.EmbeddingService;
 
 /**
- * Exposes endpoints that write documents into pgvector.
+ * Exposes endpoints that write documents into the configured vector store.
  */
 @RestController
 @RequestMapping("/embed")

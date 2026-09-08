@@ -11,28 +11,25 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.elasticsearch.ElasticsearchContainer;
 
 /**
- * Test-only configuration that wires pgvector and a deterministic embedding
+ * Test-only configuration that wires Elasticsearch and a deterministic embedding
  * model for repeatable integration tests.
  */
 @TestConfiguration(proxyBeanMethods = false)
-public class PgVectorTestConfiguration {
+public class ElasticsearchVectorStoreTestConfiguration {
 
 	/**
-	 * Starts a pgvector-enabled PostgreSQL container and exposes it through Spring
+	 * Starts an Elasticsearch container and exposes it through Spring
 	 * Boot's service connection support.
 	 */
 	@Bean
 	@ServiceConnection
-	PostgreSQLContainer<?> pgvectorContainer() {
-		return new PostgreSQLContainer<>(DockerImageName.parse("pgvector/pgvector:pg16")
-			.asCompatibleSubstituteFor("postgres"))
-			.withDatabaseName("rag")
-			.withUsername("test")
-			.withPassword("test");
+	ElasticsearchContainer elasticsearchContainer() {
+		return new ElasticsearchContainer("docker.elastic.co/elasticsearch/elasticsearch:8.15.3")
+			.withEnv("xpack.security.enabled", "false")
+			.withEnv("discovery.type", "single-node");
 	}
 
 	/**
@@ -77,7 +74,7 @@ public class PgVectorTestConfiguration {
 				String value = text == null ? "" : text.toLowerCase();
 				return new float[] {
 						score(value, "spring", "java"),
-						score(value, "postgres", "pgvector", "vector", "database"),
+						score(value, "elasticsearch", "vector", "database"),
 						score(value, "rag", "retrieval", "search"),
 						score(value, "cat", "pet", "animal")
 				};

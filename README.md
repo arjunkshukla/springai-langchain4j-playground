@@ -4,7 +4,8 @@ This repository is a Spring Boot playground for building and exploring a local R
 
 - Spring AI
 - Ollama
-- PostgreSQL + pgvector
+- Elasticsearch vector store
+- PostgreSQL for JDBC chat memory
 - a custom document ingestion pipeline
 - a small browser UI that streams answers live
 
@@ -18,7 +19,7 @@ This is not a production service. It is a learning and prototyping app that show
 - how to ingest documents from `classpath:/docs`
 - how to build a custom document transformer
 - how to chunk and embed documents for RAG
-- how to store vectors in pgvector
+- how to store vectors in Elasticsearch through Spring AI `VectorStore`
 - how to retrieve relevant chunks and feed them back into the model
 - how to stream the model output into a simple chat UI
 - how to persist chat memory in PostgreSQL
@@ -44,7 +45,7 @@ docs in classpath
   -> DocumentSplitter / MarkdownSectionSplitter
   -> ETLService
   -> EmbeddingService
-  -> VectorStore / pgvector
+  -> VectorStore / Elasticsearch
   -> RagController
   -> ChatClient + retrieved context
   -> browser UI
@@ -58,10 +59,11 @@ The app is configured in [`src/main/resources/application.properties`](src/main/
 - `llama3.2:1b` for chat
 - `nomic-embed-text` for embeddings
 - PostgreSQL on `jdbc:postgresql://localhost:5433/rag`
-- pgvector as the Spring AI vector store backend
+- Elasticsearch on `http://localhost:9201`
+- Elasticsearch as the Spring AI vector store backend
 - JDBC chat-memory persistence for the memory demo
 
-If you want to inspect the Docker database from pgAdmin or another client, use:
+If you want to inspect the Docker chat-memory database from pgAdmin or another client, use:
 
 - host: `localhost`
 - port: `5433`
@@ -107,8 +109,8 @@ src/main/resources/
 
 src/test/java/com/ai_playground/springai_langchain4j/
   SpringAILangChain4jApplicationTests.java
-  PgVectorRagIntegrationTest.java
-  config/PgVectorTestConfiguration.java
+  ElasticsearchVectorStoreRagIntegrationTest.java
+  config/ElasticsearchVectorStoreTestConfiguration.java
 
 compose.yaml
 ```
@@ -121,7 +123,7 @@ The main runtime uses:
 - Spring AI 1.1.6
 - LangChain4j 0.35.0
 - Spring Web
-- Spring AI pgvector starter
+- Spring AI Elasticsearch vector-store starter
 - Spring AI JDBC chat-memory repository
 - Coredeux Spring Boot starters
 
@@ -154,33 +156,33 @@ What these mean:
 - `llama3.2:1b` is the small chat model used for quick local responses.
 - `nomic-embed-text` is used to create embeddings for vector search.
 
-### PostgreSQL / pgvector
+### Elasticsearch Vector Store
+
+```properties
+spring.elasticsearch.uris=http://localhost:9201
+spring.ai.vectorstore.elasticsearch.initialize-schema=true
+spring.ai.vectorstore.elasticsearch.index-name=spring-ai-document-index
+spring.ai.vectorstore.elasticsearch.dimensions=768
+spring.ai.vectorstore.elasticsearch.similarity=cosine
+```
+
+What these mean:
+
+- Elasticsearch runs in Docker and is exposed on host port `9201`
+- Spring AI stores vectors in the `spring-ai-document-index` index
+- vectors are compared using cosine similarity
+- the index mapping is initialized automatically
+- the embedding size is set to `768`, which matches the Ollama embedding model
+
+### PostgreSQL Chat Memory
+
+PostgreSQL is still used for the JDBC chat-memory repository:
 
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5433/rag
 spring.datasource.username=test
 spring.datasource.password=test
 spring.datasource.driver-class-name=org.postgresql.Driver
-
-spring.ai.vectorstore.pgvector.initialize-schema=true
-spring.ai.vectorstore.pgvector.schema-name=public
-spring.ai.vectorstore.pgvector.table-name=spring_ai_vector_store
-spring.ai.vectorstore.pgvector.distance-type=cosine-distance
-spring.ai.vectorstore.pgvector.index-type=hnsw
-spring.ai.vectorstore.pgvector.dimensions=768
-```
-
-What these mean:
-
-- the database runs in Docker and is exposed on host port `5433`
-- Spring AI uses the `public.spring_ai_vector_store` table
-- vectors are compared using cosine distance
-- the table is initialized automatically
-- the embedding size is set to `768`, which matches the Ollama embedding model
-
-### Chat memory repository
-
-```properties
 spring.ai.chat.memory.repository.jdbc.initialize-schema=always
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
